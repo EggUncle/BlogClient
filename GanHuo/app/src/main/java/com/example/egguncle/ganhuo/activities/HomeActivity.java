@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -148,7 +149,7 @@ public class HomeActivity extends AppCompatActivity {
         private RecyclerView mRcvHome;
         private List<GanHuoInfo.ResultsBean> mResultsBeanList;
         private int lastVisibleItem;
-        private static int pageNum=2;
+        private static int pageNum = 2;
 
         /**
          * The fragment argument representing the section number for this
@@ -182,10 +183,12 @@ public class HomeActivity extends AppCompatActivity {
             mRcvHome.setLayoutManager(mLinearLayoutManager);
             mRcvHome.setItemAnimator(new DefaultItemAnimator());
             mRcvHome.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
-            if (mGanHuoInfo==null){
-                mGanHuoInfo=new GanHuoInfo();
+            if (mGanHuoInfo == null) {
+                mGanHuoInfo = new GanHuoInfo();
             }
-            mResultsBeanList=  mGanHuoInfo.getResults();
+            mResultsBeanList = new ArrayList<>();
+
+            mResultsBeanList = mGanHuoInfo.getResults();
             mHomeRcvAdapter = new HomeRcvAdapter(getActivity(), mResultsBeanList);
             mRcvHome.setAdapter(mHomeRcvAdapter);
             //recyclerview滚动监听
@@ -197,32 +200,42 @@ public class HomeActivity extends AppCompatActivity {
                     // 滑动状态停止并且剩余少于两个item时，自动加载下一页
                     if (newState == RecyclerView.SCROLL_STATE_IDLE
                             && lastVisibleItem + 5 >= mLinearLayoutManager.getItemCount()) {
-                            String type="";
-                            switch (getArguments().getInt(ARG_SECTION_NUMBER)){
-                                case  1: type=URLUtils.S_ANDROID; break;
-                                case  2: type=URLUtils.S_IOS;break;
-                                case  3: type=URLUtils.S_HTML;break;
-                                case  4: type=URLUtils.S_GIRL;break;
-                            }
+                        String type = "";
+                        switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
+                            case 1:
+                                type = URLUtils.S_ANDROID;
+                                break;
+                            case 2:
+                                type = URLUtils.S_IOS;
+                                break;
+                            case 3:
+                                type = URLUtils.S_HTML;
+                                break;
+                            case 4:
+                                type = URLUtils.S_GIRL;
+                                break;
+                        }
 
-                            StringRequest request = new StringRequest(Request.Method.GET, URLUtils.getMyUrl(type, pageNum++), new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    GanHuoInfo info = new Gson().fromJson(response, GanHuoInfo.class);
+                        StringRequest request = new StringRequest(Request.Method.GET, URLUtils.getMyUrl(type, pageNum++), new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                GanHuoInfo info = new Gson().fromJson(response, GanHuoInfo.class);
+                                if (info.getResults()!= null&&mResultsBeanList!=null) {
                                     mResultsBeanList.addAll(info.getResults());
                                     mHomeRcvAdapter.notifyDataSetChanged();
                                 }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
 
-                                }
-                            });
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+
+                            }
+                        });
 
 
-                            request.setTag("newGet");
-                            MyApplication.getHttpQueues().add(request);
-
+                        request.setTag("newGet");
+                        MyApplication.getHttpQueues().add(request);
 
 
                     }
