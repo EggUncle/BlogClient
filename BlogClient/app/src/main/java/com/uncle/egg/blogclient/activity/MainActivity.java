@@ -7,20 +7,16 @@ import android.content.IntentFilter;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 
 import com.uncle.egg.blogclient.R;
 import com.uncle.egg.blogclient.adapter.RcvAdapterHomePage;
-import com.uncle.egg.blogclient.bean.BlogJson;
 import com.uncle.egg.blogclient.bean.Results;
 import com.uncle.egg.blogclient.util.InternetUtil;
 
@@ -34,8 +30,8 @@ import java.util.List;
  */
 public class MainActivity extends BaseAcitvity {
 
-    private FrameLayout activityMain;
-    private Toolbar toolbarHome;
+ //   private FrameLayout activityMain;
+    private Toolbar  toolbar;
     private SwipeRefreshLayout rshHome;
     private RecyclerView rcvHome;
     private FloatingActionButton fabHome;
@@ -53,19 +49,24 @@ public class MainActivity extends BaseAcitvity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_home);
-        setSupportActionBar(toolbar);
+       // setContentView(R.layout.activity_main);
+//        toolbar = (Toolbar) findViewById(R.id.toolbar_home);
+//        setSupportActionBar(toolbar);
 
         initView();
         initAction();
         initData();
     }
 
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_main;
+    }
+
 
     private void initView() {
-        activityMain = (FrameLayout) findViewById(R.id.activity_main);
-        toolbarHome = (Toolbar) findViewById(R.id.toolbar_home);
+      //  activityMain = (FrameLayout) findViewById(R.id.activity_main);
+   //     toolbarHome = (Toolbar) findViewById(R.id.toolbar_home);
         rshHome = (SwipeRefreshLayout) findViewById(R.id.rsh_home);
         rcvHome = (RecyclerView) findViewById(R.id.rcv_home);
         fabHome = (FloatingActionButton) findViewById(R.id.fab_home);
@@ -87,6 +88,7 @@ public class MainActivity extends BaseAcitvity {
             }
         });
 
+
     }
 
     private void initData() {
@@ -98,17 +100,28 @@ public class MainActivity extends BaseAcitvity {
 
         listBlog = new ArrayList<>();
         rcvAdapterHomePage = new RcvAdapterHomePage(listBlog);
-        rcvHome.setLayoutManager(new LinearLayoutManager(this));
-        rcvHome.setHasFixedSize(true);
-        rcvHome.setItemAnimator(new DefaultItemAnimator());
-        rcvHome.setAdapter(rcvAdapterHomePage);
+//
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
-        return super.onCreateOptionsMenu(menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_login:
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                break;
+            default:
+              //  return super.onOptionsItemSelected(item);
+        }
+        return true;
+
     }
 
     @Override
