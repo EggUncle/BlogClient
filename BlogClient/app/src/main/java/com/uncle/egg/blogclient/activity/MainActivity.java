@@ -8,6 +8,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,8 +32,8 @@ import java.util.List;
  */
 public class MainActivity extends BaseAcitvity {
 
- //   private FrameLayout activityMain;
-    private Toolbar  toolbar;
+    //   private FrameLayout activityMain;
+    private Toolbar toolbar;
     private SwipeRefreshLayout rshHome;
     private RecyclerView rcvHome;
     private FloatingActionButton fabHome;
@@ -49,7 +51,7 @@ public class MainActivity extends BaseAcitvity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // setContentView(R.layout.activity_main);
+        // setContentView(R.layout.activity_main);
 //        toolbar = (Toolbar) findViewById(R.id.toolbar_home);
 //        setSupportActionBar(toolbar);
 
@@ -65,10 +67,13 @@ public class MainActivity extends BaseAcitvity {
 
 
     private void initView() {
-      //  activityMain = (FrameLayout) findViewById(R.id.activity_main);
-   //     toolbarHome = (Toolbar) findViewById(R.id.toolbar_home);
+        //  activityMain = (FrameLayout) findViewById(R.id.activity_main);
+        //     toolbarHome = (Toolbar) findViewById(R.id.toolbar_home);
         rshHome = (SwipeRefreshLayout) findViewById(R.id.rsh_home);
         rcvHome = (RecyclerView) findViewById(R.id.rcv_home);
+        rcvHome.setLayoutManager(new LinearLayoutManager(this));
+        rcvHome.setItemAnimator(new DefaultItemAnimator());
+
         fabHome = (FloatingActionButton) findViewById(R.id.fab_home);
     }
 
@@ -76,15 +81,17 @@ public class MainActivity extends BaseAcitvity {
         rshHome.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                rshHome.setRefreshing(false);
+
+                InternetUtil internetUtil = new InternetUtil(localBroadcastManager);
+                internetUtil.getBlog(listBlog);
             }
         });
 
         fabHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                InternetUtil internetUtil = new InternetUtil(localBroadcastManager);
-                internetUtil.getBlog(listBlog);
+
+                startActivity(new Intent(MainActivity.this, EditBlogActivity.class));
             }
         });
 
@@ -100,7 +107,7 @@ public class MainActivity extends BaseAcitvity {
 
         listBlog = new ArrayList<>();
         rcvAdapterHomePage = new RcvAdapterHomePage(listBlog);
-//
+        rcvHome.setAdapter(rcvAdapterHomePage);
 
     }
 
@@ -118,7 +125,7 @@ public class MainActivity extends BaseAcitvity {
                 startActivity(intent);
                 break;
             default:
-              //  return super.onOptionsItemSelected(item);
+                //  return super.onOptionsItemSelected(item);
         }
         return true;
 
@@ -140,7 +147,10 @@ public class MainActivity extends BaseAcitvity {
 //                Log.i(TAG, "onReceive: -------------------------");
 //            }
             Log.i(TAG, "onReceive: " + listBlog.size());
+            rshHome.setRefreshing(false);
             rcvAdapterHomePage.notifyDataSetChanged();
+
+
         }
     }
 }

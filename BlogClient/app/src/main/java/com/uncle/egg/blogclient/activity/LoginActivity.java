@@ -103,7 +103,7 @@ public class LoginActivity extends BaseAcitvity {
                 Log.i(TAG, "onReceive: "+userInfo.getUserName());
                 Toast.makeText(context, "login success", Toast.LENGTH_SHORT).show();
                 SPUtil.getInstance(context);
-                SPUtil.saveUserInfo(userInfo.getUserName());
+                SPUtil.saveUserInfo(userInfo);
                 finish();
             } else {
                 Toast.makeText(context, "login failed", Toast.LENGTH_SHORT).show();

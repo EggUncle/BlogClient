@@ -33,6 +33,8 @@ public class InternetUtil {
 
     private final static String URL_BLOG = "http://192.168.1.106:8080/json/blog";
     private final static String URL_LOGIN = "http://192.168.1.106:8080/json/client_login";
+    private final static String URL_SUMBIT_BLOG="http://192.168.1.106:8080/client/submit_blog";
+
     private final static String TAG = "InternetUtil";
 
     private LocalBroadcastManager localBroadcastManager;
@@ -121,6 +123,39 @@ public class InternetUtil {
             }
         };
         MyApplication.getHttpQueues().add(requestLogin);
+    }
+
+
+    /**
+     * 发送博客的方法
+     * @param userId
+     * @param title
+     * @param content
+     */
+    public void submitBlog(final String userId, final String title, final String content){
+        StringRequest submitRequest=new StringRequest(Request.Method.POST, URL_SUMBIT_BLOG, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                Log.i(TAG, "onResponse: "+response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params=new HashMap<>();
+                params.put("userId",userId+"");
+                params.put("title",title);
+                params.put("content",content);
+
+                return params;
+            }
+        };
+        MyApplication.getHttpQueues().add(submitRequest);
     }
 
 }
