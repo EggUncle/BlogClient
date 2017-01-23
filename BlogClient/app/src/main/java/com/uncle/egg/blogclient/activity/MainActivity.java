@@ -41,12 +41,16 @@ public class MainActivity extends BaseAcitvity {
     private BlogJsonReceiver blogJsonReceiver;
     private LocalBroadcastManager localBroadcastManager;
     private IntentFilter intentFilter;
+    private InternetUtil internetUtil;
 
     private List<Results> listBlog;
     private RcvAdapterHomePage rcvAdapterHomePage;
 
     public final static String BLOG_BROADCAST = "com.uncle.egg.BLOG_BOROADCAST";
     private final static String TAG = "MainActivity";
+
+    private int maxId=0;
+    private int minId=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,8 +86,7 @@ public class MainActivity extends BaseAcitvity {
             @Override
             public void onRefresh() {
 
-                InternetUtil internetUtil = new InternetUtil(localBroadcastManager);
-                internetUtil.getBlog(listBlog);
+                internetUtil.getBlog(listBlog,InternetUtil.GET_MORE_MAX,maxId);
             }
         });
 
@@ -100,6 +103,7 @@ public class MainActivity extends BaseAcitvity {
 
     private void initData() {
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        internetUtil = new InternetUtil(localBroadcastManager);
         intentFilter = new IntentFilter();
         intentFilter.addAction(BLOG_BROADCAST);
         blogJsonReceiver = new BlogJsonReceiver();
@@ -124,6 +128,9 @@ public class MainActivity extends BaseAcitvity {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.menu_test:
+                Intent intent1=new Intent(MainActivity.this,TestActivity.class);
+                startActivity(intent1);
             default:
                 //  return super.onOptionsItemSelected(item);
         }
@@ -140,13 +147,14 @@ public class MainActivity extends BaseAcitvity {
     private class BlogJsonReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            BlogJson blogJson = (BlogJson) getIntent().getSerializableExtra("blogJson");
-//            if (blogJson!=null){
-//            Log.i(TAG, "onReceive: " +blogJson.getResults().size());}
-//            else {
-//                Log.i(TAG, "onReceive: -------------------------");
-//            }
-            Log.i(TAG, "onReceive: " + listBlog.size());
+
+            maxId=intent.getIntExtra("maxId",maxId);
+            minId=intent.getIntExtra("minId",minId);
+
+            Log.i(TAG, "onReceive: listSize" + listBlog.size());
+            Log.i(TAG, "onReceive: maxId" + maxId);
+            Log.i(TAG, "onReceive: minId" + minId);
+
             rshHome.setRefreshing(false);
             rcvAdapterHomePage.notifyDataSetChanged();
 

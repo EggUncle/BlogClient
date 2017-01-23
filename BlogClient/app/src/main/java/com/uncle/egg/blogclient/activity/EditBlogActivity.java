@@ -57,8 +57,6 @@ public class EditBlogActivity extends BaseAcitvity {
 
                 String title=edTitle.getEditText().getText().toString();
                 String content=edContent.getEditText().getText().toString();
-
-
                 internetUtil.submitBlog(userId,title,content);
             }
         });
