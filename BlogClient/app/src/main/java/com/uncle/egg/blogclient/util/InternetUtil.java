@@ -187,7 +187,10 @@ public class InternetUtil {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> param = new HashMap<>();
                 param.put("userName", userName);
-                param.put("passwd", passwd);
+                //对密码进行MD5加密
+                CipherUtil cipherUtil=new CipherUtil();
+                String passwdByMd5 = cipherUtil.generatePassword(passwd);
+                param.put("passwd", passwdByMd5);
 
                 return param;
             }

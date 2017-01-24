@@ -85,7 +85,6 @@ public class MainActivity extends BaseAcitvity {
         rshHome.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-
                 internetUtil.getBlog(listBlog,InternetUtil.GET_MORE_MAX,maxId);
             }
         });
@@ -93,10 +92,10 @@ public class MainActivity extends BaseAcitvity {
         fabHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 startActivity(new Intent(MainActivity.this, EditBlogActivity.class));
             }
         });
+
 
 
     }
