@@ -10,9 +10,7 @@ public class TableUserByUserId implements Serializable{
     private int userId;
 
     private String username;
-
-    private String userpasswd;
-
+    
     public void setUserId(int userId){
         this.userId = userId;
     }
@@ -25,11 +23,6 @@ public class TableUserByUserId implements Serializable{
     public String getUsername(){
         return this.username;
     }
-    public void setUserpasswd(String userpasswd){
-        this.userpasswd = userpasswd;
-    }
-    public String getUserpasswd(){
-        return this.userpasswd;
-    }
+
 
 }

@@ -1,5 +1,7 @@
 package com.uncle.egg.blogclient.adapter;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.uncle.egg.blogclient.R;
+import com.uncle.egg.blogclient.activity.DetailsActivity;
+import com.uncle.egg.blogclient.activity.MainActivity;
 import com.uncle.egg.blogclient.bean.Blog;
 import com.uncle.egg.blogclient.bean.Results;
 
@@ -33,10 +37,20 @@ public class RcvAdapterHomePage extends RecyclerView.Adapter<RcvAdapterHomePage.
     }
 
     @Override
-    public void onBindViewHolder(RcvAdapterHomePage.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RcvAdapterHomePage.ViewHolder holder, final int position) {
         holder.tvAuthor.setText(listBlog.get(position).getTableUserByUserId().getUsername());
         holder.tvTitle.setText(listBlog.get(position).getBlogTitle());
         holder.tvDate.setText(listBlog.get(position).getBlogDate());
+
+        //rcv对应的点击事件，点击后进入详情页面，并且传入对应的博客对象
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //使用DetailsActivity专用的方法来启动activity
+                DetailsActivity.startAction(view.getContext(),listBlog.get(position));
+            }
+        });
+
     }
 
     @Override
