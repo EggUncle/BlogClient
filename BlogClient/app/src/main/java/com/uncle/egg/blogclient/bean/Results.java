@@ -18,6 +18,8 @@ public class Results implements Serializable {
 
     private TableUserByUserId tableUserByUserId;
 
+    private String imgPath;
+
     public void setBlogId(int blogId){
         this.blogId = blogId;
     }
@@ -48,5 +50,10 @@ public class Results implements Serializable {
     public TableUserByUserId getTableUserByUserId(){
         return this.tableUserByUserId;
     }
-
+    public void setImgPath(String imgPath){
+        this.imgPath = imgPath;
+    }
+    public String getImgPath(){
+        return this.imgPath;
+    }
 }

@@ -35,20 +35,20 @@ public class InternetUtil {
 
     private final static String TAG = "InternetUtil";
 
-    private final static String URL_BASE = "http://192.168.1.106:8080/";
+    private final static String URL_BASE = "http://192.168.1.106:8080";
 
     //获取单条博客的URL  GET   ex:http://localhost:8080/json/blog/one/20
-    private final static String URL_ONE_BLOG = URL_BASE + "json/blog/one/";
+    private final static String URL_ONE_BLOG = URL_BASE + "/api/blog/one/";
     //获取比该ID更大的博客的URL （20条）GET     ex:http://localhost:8080/json/blog/max/20
-    private final static String URL_MAX_BLOG = URL_BASE + "json/blog/max/";
+    private final static String URL_MAX_BLOG = URL_BASE + "/api/blog/max/";
     //获取比该ID更小的博客的URL  （20条）GET     ex:http://localhost:8080/json/blog/min/20
-    private final static String URL_MIN_BLOG = URL_BASE + "json/blog/min/";
+    private final static String URL_MIN_BLOG = URL_BASE + "/api/blog/min/";
 
 
     //登录用的URL  POST  参数 userName passwd
-    private final static String URL_LOGIN = URL_BASE + "json/client_login";
+    private final static String URL_LOGIN = URL_BASE + "/api/client_login";
     //发布博客用的URL POST 参数 userId title content
-    private final static String URL_SUMBIT_BLOG = URL_BASE + "json/submit_blog";
+    private final static String URL_SUMBIT_BLOG = URL_BASE + "/api/submit_blog";
 
     public final static int GET_MORE_MAX = 1;
     public final static int GET_MORE_MIN = 2;
@@ -163,9 +163,18 @@ public class InternetUtil {
                 Log.i(TAG, "onResponse: " + response);
                 Gson gson = new Gson();
                 LoginJson loginJson = gson.fromJson(response, LoginJson.class);
-                Log.i(TAG, "onResponse: " + loginJson.getUserName());
-                Log.i(TAG, "onResponse: " + loginJson.getSuccess());
+                Log.i(TAG, "onResponse: " + loginJson.getUserEntity().getUsername());
+                Log.i(TAG, "onResponse: " + loginJson.getUserEntity().getBgPath());
+
                 Log.i(TAG, "onResponse: " + loginJson.isError());
+
+                //拼接出图片的地址
+                String bgpath=URL_BASE+loginJson.getUserEntity().getBgPath();
+                String iconPath=URL_BASE+loginJson.getUserEntity().getIconPath();
+                Log.i(TAG, "onResponse: "+bgpath);
+                //将拼接出的图片地址设置给user
+                loginJson.getUserEntity().setBgPath(bgpath);
+                loginJson.getUserEntity().setIconPath(iconPath);
 
                 Intent intent = new Intent(LoginActivity.LOGIN_BROADCAST);
 

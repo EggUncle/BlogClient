@@ -10,7 +10,7 @@ import java.util.List;
 public class BlogJson implements Serializable{
     private boolean error;
 
-    private List<Results> results ;
+    private List<Results> results;
 
     public void setError(boolean error){
         this.error = error;

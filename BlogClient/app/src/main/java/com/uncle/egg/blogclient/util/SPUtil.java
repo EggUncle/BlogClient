@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.uncle.egg.blogclient.bean.LoginJson;
+import com.uncle.egg.blogclient.bean.TableUserByUserId;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,11 +39,16 @@ public class SPUtil {
         return instance;
     }
 
-    public static void saveUserInfo(LoginJson userInfo) {
+    public static void saveUserInfo(TableUserByUserId userInfo) {
 
-        mEditor.putString("userName", userInfo.getUserName());
+        mEditor.putString("userName", userInfo.getUsername());
         mEditor.putString("userId", userInfo.getUserId() + "");
-        Log.i(TAG, "saveUserInfo: " + userInfo.getUserName() + "  " + userInfo.getUserId());
+        mEditor.putString("nickName",userInfo.getNickname());
+        mEditor.putString("description",userInfo.getDescription());
+        mEditor.putString("iconPath",userInfo.getIconPath());
+        mEditor.putString("bgPath",userInfo.getBgPath());
+
+        Log.i(TAG, "saveUserInfo: " + userInfo.getUsername() + "  " + userInfo.getUserId());
 
         mEditor.commit();
     }

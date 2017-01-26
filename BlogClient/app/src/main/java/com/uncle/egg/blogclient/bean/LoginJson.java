@@ -11,16 +11,8 @@ public class LoginJson implements Serializable{
     //是否发生错误
     private boolean error;
 
-    //用户名
-    private String userName;
-
-    //用户ID
-    private int userId;
-
-
-    //是否成功
-    private boolean success;
-
+    //结果
+    private TableUserByUserId userEntity;
 
     public boolean isError() {
         return error;
@@ -30,28 +22,11 @@ public class LoginJson implements Serializable{
         this.error = error;
     }
 
-    public String getUserName() {
-        return userName;
+    public TableUserByUserId getUserEntity() {
+        return userEntity;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserEntity(TableUserByUserId userEntity) {
+        this.userEntity = userEntity;
     }
-
-    public boolean getSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
 }

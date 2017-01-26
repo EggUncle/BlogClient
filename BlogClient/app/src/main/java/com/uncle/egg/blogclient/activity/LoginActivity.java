@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.uncle.egg.blogclient.R;
 import com.uncle.egg.blogclient.bean.LoginJson;
+import com.uncle.egg.blogclient.bean.TableUserByUserId;
 import com.uncle.egg.blogclient.util.InternetUtil;
 import com.uncle.egg.blogclient.util.SPUtil;
 
@@ -97,11 +98,12 @@ public class LoginActivity extends BaseAcitvity {
         @Override
         public void onReceive(Context context, Intent intent) {
             //接收广播中的loginjson对象
-            LoginJson userInfo = (LoginJson) intent.getExtras().getSerializable("userInfo");
-            boolean success = userInfo.getSuccess();
-            if (success) {
-                Log.i(TAG, "onReceive: "+userInfo.getUserName());
+            LoginJson loginJson = (LoginJson) intent.getExtras().getSerializable("userInfo");
+            boolean error = loginJson.isError();
+            if (!error) {
+             //   Log.i(TAG, "onReceive: "+userInfo.getUserName());
                 Toast.makeText(context, "login success", Toast.LENGTH_SHORT).show();
+                TableUserByUserId userInfo=loginJson.getUserEntity();
                 SPUtil.getInstance(context);
                 SPUtil.saveUserInfo(userInfo);
                 finish();
