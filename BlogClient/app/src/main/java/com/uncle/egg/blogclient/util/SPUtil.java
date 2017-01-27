@@ -70,4 +70,14 @@ public class SPUtil {
         return mSharedPreferences.getString("bgPath", "");
     }
 
+    //获取用户昵称
+    public static String getNickName(){
+        return mSharedPreferences.getString("nickName","");
+    }
+
+    //获取用户描述
+    public static String getDescription(){
+        return mSharedPreferences.getString("description","");
+    }
+
 }

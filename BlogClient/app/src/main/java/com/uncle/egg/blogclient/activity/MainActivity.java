@@ -109,7 +109,7 @@ public class MainActivity extends BaseAcitvity {
         localBroadcastManager.registerReceiver(blogJsonReceiver, intentFilter);
 
         listBlog = new ArrayList<>();
-        rcvAdapterHomePage = new RcvAdapterHomePage(listBlog);
+        rcvAdapterHomePage = new RcvAdapterHomePage(listBlog,this);
         rcvHome.setAdapter(rcvAdapterHomePage);
 
     }

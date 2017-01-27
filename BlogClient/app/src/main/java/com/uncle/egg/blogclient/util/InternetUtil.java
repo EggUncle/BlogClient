@@ -34,7 +34,7 @@ public class InternetUtil {
 
     private final static String TAG = "InternetUtil";
 
-    private final static String URL_BASE = "http://192.168.1.106:8080";
+    public final static String URL_BASE = "http://192.168.1.106:8080";
 
     //获取单条博客的URL  GET   ex:http://localhost:8080/json/blog/one/20
     private final static String URL_ONE_BLOG = URL_BASE + "/api/blog/one/";
@@ -116,6 +116,7 @@ public class InternetUtil {
                 List<Results> listResults = blogJson.getResults();
 
                 Intent intent = new Intent(HomeActivity.HOME_BROADCAST);
+                intent.putExtra("type", BLOG);
                 //若结果为空，直接返回
                 if (listResults == null || listResults.size() == 0) {
                     localBroadcastManager.sendBroadcast(intent);
@@ -132,7 +133,7 @@ public class InternetUtil {
                 maxId = listResults.get(0).getBlogId();
                 minId = listResults.get(listResults.size() - 1).getBlogId();
 
-                intent.putExtra("type", BLOG);
+
                 intent.putExtra("maxId", maxId);
                 intent.putExtra("minId", minId);
 

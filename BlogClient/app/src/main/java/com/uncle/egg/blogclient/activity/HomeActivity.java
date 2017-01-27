@@ -149,6 +149,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void initData() {
+        //广播相关
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         internetUtil = new InternetUtil(localBroadcastManager);
         intentFilter = new IntentFilter();
@@ -157,16 +158,24 @@ public class HomeActivity extends AppCompatActivity
         blogJsonReceiver = new HomeActivity.BlogJsonReceiver();
         localBroadcastManager.registerReceiver(blogJsonReceiver, intentFilter);
 
+        //rcv相关
         listBlog = new ArrayList<>();
-        rcvAdapterHomePage = new RcvAdapterHomePage(listBlog);
+        rcvAdapterHomePage = new RcvAdapterHomePage(listBlog,this);
         rcvHome.setAdapter(rcvAdapterHomePage);
 
+
+        //初始化侧划菜单部分
+        //用户昵称和描述
         spUtil = SPUtil.getInstance(this);
+        String nickName = spUtil.getNickName();
+        String description = spUtil.getDescription();
+        tvName.setText(nickName);
+        tvDescription.setText(description);
+
         //加载头像
         //获取图片地址（网络）
         String iconImgUrl = spUtil.getIconPath();
         if (!"".equals(iconImgUrl)) {
-            // internetUtil.getImage(InternetUtil.ICON,imgUrl);
             Glide.with(HomeActivity.this)
                     .load(iconImgUrl)
                     //  .override(100, 100)
@@ -177,7 +186,6 @@ public class HomeActivity extends AppCompatActivity
 
         String bgImgUrl = spUtil.getBgPath();
         if (!"".equals(bgImgUrl)) {
-            // internetUtil.getImage(InternetUtil.ICON,imgUrl);
             Glide.with(HomeActivity.this)
                     .load(bgImgUrl)
                     //  .override(100, 100)
