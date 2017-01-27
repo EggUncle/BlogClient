@@ -28,6 +28,7 @@ public class SPUtil {
     private SPUtil() {
     }
 
+    //获取实例
     public static SPUtil getInstance(Context context) {
         if (instance == null) {
             synchronized (SPUtil.class) {
@@ -39,22 +40,34 @@ public class SPUtil {
         return instance;
     }
 
+    //保存用户信息
     public static void saveUserInfo(TableUserByUserId userInfo) {
 
         mEditor.putString("userName", userInfo.getUsername());
         mEditor.putString("userId", userInfo.getUserId() + "");
-        mEditor.putString("nickName",userInfo.getNickname());
-        mEditor.putString("description",userInfo.getDescription());
-        mEditor.putString("iconPath",userInfo.getIconPath());
-        mEditor.putString("bgPath",userInfo.getBgPath());
+        mEditor.putString("nickName", userInfo.getNickname());
+        mEditor.putString("description", userInfo.getDescription());
+        mEditor.putString("iconPath", userInfo.getIconPath());
+        mEditor.putString("bgPath", userInfo.getBgPath());
 
         Log.i(TAG, "saveUserInfo: " + userInfo.getUsername() + "  " + userInfo.getUserId());
 
         mEditor.commit();
     }
 
+    //获取用户ID
     public static String getUserId() {
-        return mSharedPreferences.getString("userId","0");
+        return mSharedPreferences.getString("userId", "0");
+    }
+
+    //获取用户头像路径
+    public static String getIconPath() {
+        return mSharedPreferences.getString("iconPath", "");
+    }
+
+    //获取用户背景图片路径
+    public static String getBgPath() {
+        return mSharedPreferences.getString("bgPath", "");
     }
 
 }

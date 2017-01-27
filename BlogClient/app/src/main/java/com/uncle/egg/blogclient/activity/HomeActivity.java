@@ -4,9 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -22,13 +22,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.uncle.egg.blogclient.R;
 import com.uncle.egg.blogclient.adapter.RcvAdapterHomePage;
 import com.uncle.egg.blogclient.bean.Results;
 import com.uncle.egg.blogclient.util.InternetUtil;
+import com.uncle.egg.blogclient.util.SPUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,10 +56,9 @@ public class HomeActivity extends AppCompatActivity
     private CircleImageView imgIcon;
     private TextView tvName;
     private TextView tvDescription;
+    private ImageView imgBg;
 
     private View headerView;
-
-
 
 
     private HomeActivity.BlogJsonReceiver blogJsonReceiver;
@@ -67,11 +69,13 @@ public class HomeActivity extends AppCompatActivity
     private List<Results> listBlog;
     private RcvAdapterHomePage rcvAdapterHomePage;
 
-    public final static String BLOG_BROADCAST = "com.uncle.egg.BLOG_BOROADCAST";
+    private SPUtil spUtil;
+
+    public final static String HOME_BROADCAST = "com.uncle.egg.HOME_BOROADCAST";
     private final static String TAG = "HomeActivity";
 
-    private int maxId=0;
-    private int minId=0;
+    private int maxId = 0;
+    private int minId = 0;
 
 
     @Override
@@ -87,13 +91,6 @@ public class HomeActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-//        headerView=getLayoutInflater().inflate(R.layout.nav_header_home,null);
-
-
-
-
-
         fab = (FloatingActionButton) findViewById(R.id.fab);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
@@ -107,11 +104,12 @@ public class HomeActivity extends AppCompatActivity
         //headerview 部分 ,需要这样获取一下才能得到headerview
         //或者注释掉xml的app:headerLayout部分，使用navigationView.inflateHeaderView(R.layout.navigation_header);
 
-        headerView=navigationView.getHeaderView(0);
+        headerView = navigationView.getHeaderView(0);
         headerBg = (LinearLayout) headerView.findViewById(R.id.header_bg);
         imgIcon = (CircleImageView) headerView.findViewById(R.id.img_icon);
         tvName = (TextView) headerView.findViewById(R.id.tv_name);
         tvDescription = (TextView) headerView.findViewById(R.id.tv_description);
+        imgBg = (ImageView) headerView.findViewById(R.id.img_bg);
 
         rshHome = (SwipeRefreshLayout) findViewById(R.id.rsh_home);
         rcvHome = (RecyclerView) findViewById(R.id.rcv_home);
@@ -125,7 +123,7 @@ public class HomeActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(HomeActivity.this,EditBlogActivity.class);
+                Intent intent = new Intent(HomeActivity.this, EditBlogActivity.class);
                 startActivity(intent);
             }
         });
@@ -134,7 +132,7 @@ public class HomeActivity extends AppCompatActivity
         rshHome.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                internetUtil.getBlog(listBlog,InternetUtil.GET_MORE_MAX,maxId);
+                internetUtil.getBlog(listBlog, InternetUtil.GET_MORE_MAX, maxId);
             }
         });
 
@@ -142,7 +140,7 @@ public class HomeActivity extends AppCompatActivity
         imgIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(HomeActivity.this,LoginActivity.class);
+                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
         });
@@ -154,7 +152,8 @@ public class HomeActivity extends AppCompatActivity
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         internetUtil = new InternetUtil(localBroadcastManager);
         intentFilter = new IntentFilter();
-        intentFilter.addAction(BLOG_BROADCAST);
+        intentFilter.addAction(HOME_BROADCAST);
+
         blogJsonReceiver = new HomeActivity.BlogJsonReceiver();
         localBroadcastManager.registerReceiver(blogJsonReceiver, intentFilter);
 
@@ -162,13 +161,38 @@ public class HomeActivity extends AppCompatActivity
         rcvAdapterHomePage = new RcvAdapterHomePage(listBlog);
         rcvHome.setAdapter(rcvAdapterHomePage);
 
+        spUtil = SPUtil.getInstance(this);
+        //加载头像
+        //获取图片地址（网络）
+        String iconImgUrl = spUtil.getIconPath();
+        if (!"".equals(iconImgUrl)) {
+            // internetUtil.getImage(InternetUtil.ICON,imgUrl);
+            Glide.with(HomeActivity.this)
+                    .load(iconImgUrl)
+                    //  .override(100, 100)
+                    .fitCenter()
+                    // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
+                    .into(imgIcon);
+        }
+
+        String bgImgUrl = spUtil.getBgPath();
+        if (!"".equals(bgImgUrl)) {
+            // internetUtil.getImage(InternetUtil.ICON,imgUrl);
+            Glide.with(HomeActivity.this)
+                    .load(bgImgUrl)
+                    //  .override(100, 100)
+                    .centerCrop()
+                    // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
+                    .into(imgBg);
+        }
+
+
     }
 
 //    @Override
 //    public int getLayoutId() {
 //        return R.layout.activity_home;
 //    }
-
 
 
     @Override
@@ -249,17 +273,22 @@ public class HomeActivity extends AppCompatActivity
     private class BlogJsonReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            //先获取intent中的类型参数
+            int type = intent.getIntExtra("type", 0);
 
-            maxId=intent.getIntExtra("maxId",maxId);
-            minId=intent.getIntExtra("minId",minId);
+            //若收到的是博客相关的广播
+            if (type == InternetUtil.BLOG) {
+                maxId = intent.getIntExtra("maxId", maxId);
+                minId = intent.getIntExtra("minId", minId);
 
-            Log.i(TAG, "onReceive: listSize" + listBlog.size());
-            Log.i(TAG, "onReceive: maxId" + maxId);
-            Log.i(TAG, "onReceive: minId" + minId);
+                Log.i(TAG, "onReceive: listSize" + listBlog.size());
+                Log.i(TAG, "onReceive: maxId" + maxId);
+                Log.i(TAG, "onReceive: minId" + minId);
 
-            rshHome.setRefreshing(false);
-            rcvAdapterHomePage.notifyDataSetChanged();
+                rshHome.setRefreshing(false);
+                rcvAdapterHomePage.notifyDataSetChanged();
 
+            }
 
         }
     }

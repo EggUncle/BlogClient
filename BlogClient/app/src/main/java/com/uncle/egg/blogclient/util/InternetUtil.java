@@ -2,27 +2,26 @@ package com.uncle.egg.blogclient.util;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 import com.uncle.egg.blogclient.MyApplication;
+import com.uncle.egg.blogclient.activity.HomeActivity;
 import com.uncle.egg.blogclient.activity.LoginActivity;
-import com.uncle.egg.blogclient.activity.MainActivity;
-import com.uncle.egg.blogclient.bean.Blog;
 import com.uncle.egg.blogclient.bean.BlogJson;
 import com.uncle.egg.blogclient.bean.LoginJson;
 import com.uncle.egg.blogclient.bean.Results;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,18 @@ public class InternetUtil {
     private final static String URL_LOGIN = URL_BASE + "/api/client_login";
     //发布博客用的URL POST 参数 userId title content
     private final static String URL_SUMBIT_BLOG = URL_BASE + "/api/submit_blog";
+
+    //图片请求时使用的参数
+    //请求头像图片
+    public final static int ICON = 1;
+    //请求背景图片
+    public final static int PATH = 2;
+
+    //请求种类 用于在广播接收器中判断广播的内容
+    //博客信息的广播
+    public final static int BLOG = 1;
+    //图片信息的广播
+    public final static int IMAGE = 2;
 
     public final static int GET_MORE_MAX = 1;
     public final static int GET_MORE_MIN = 2;
@@ -104,7 +115,7 @@ public class InternetUtil {
                 BlogJson blogJson = gson.fromJson(response, BlogJson.class);
                 List<Results> listResults = blogJson.getResults();
 
-                Intent intent = new Intent(MainActivity.BLOG_BROADCAST);
+                Intent intent = new Intent(HomeActivity.HOME_BROADCAST);
                 //若结果为空，直接返回
                 if (listResults == null || listResults.size() == 0) {
                     localBroadcastManager.sendBroadcast(intent);
@@ -121,11 +132,11 @@ public class InternetUtil {
                 maxId = listResults.get(0).getBlogId();
                 minId = listResults.get(listResults.size() - 1).getBlogId();
 
-
+                intent.putExtra("type", BLOG);
                 intent.putExtra("maxId", maxId);
                 intent.putExtra("minId", minId);
 
-                //发送广播给MainActivity，更新adapter
+                //发送广播给HomeActivity，更新adapter
                 localBroadcastManager.sendBroadcast(intent);
 
             }
@@ -169,9 +180,9 @@ public class InternetUtil {
                 Log.i(TAG, "onResponse: " + loginJson.isError());
 
                 //拼接出图片的地址
-                String bgpath=URL_BASE+loginJson.getUserEntity().getBgPath();
-                String iconPath=URL_BASE+loginJson.getUserEntity().getIconPath();
-                Log.i(TAG, "onResponse: "+bgpath);
+                String bgpath = URL_BASE + loginJson.getUserEntity().getBgPath();
+                String iconPath = URL_BASE + loginJson.getUserEntity().getIconPath();
+                Log.i(TAG, "onResponse: " + bgpath);
                 //将拼接出的图片地址设置给user
                 loginJson.getUserEntity().setBgPath(bgpath);
                 loginJson.getUserEntity().setIconPath(iconPath);
@@ -197,7 +208,7 @@ public class InternetUtil {
                 Map<String, String> param = new HashMap<>();
                 param.put("userName", userName);
                 //对密码进行MD5加密
-                CipherUtil cipherUtil=new CipherUtil();
+                CipherUtil cipherUtil = new CipherUtil();
                 String passwdByMd5 = cipherUtil.generatePassword(passwd);
                 param.put("passwd", passwdByMd5);
 
@@ -225,7 +236,7 @@ public class InternetUtil {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.i(TAG, "onErrorResponse: "+error);
+                Log.i(TAG, "onErrorResponse: " + error);
             }
         }) {
             @Override
@@ -240,5 +251,44 @@ public class InternetUtil {
         };
         MyApplication.getHttpQueues().add(submitRequest);
     }
+
+
+    /**
+     * 获取图片的类，暂时用来获取侧划菜单的icon和bg
+     *
+     * @param type 想要获取的图片类型 icon 或 bg
+     *             <p>
+     *             <p>
+     *             注意：在构建ImageRequest实例时，需要传递七个参数（六个参数的重载方法已过时，少一个ScaleType参数）
+     *             这七个参数类型分别为：
+     *             <p>
+     *             String ： 要获取的图片地址
+     *             Response.Listener<Bitmap> ： 获取图片成功的回调
+     *             int： maxWidth，获取图片的最大宽度，会自动进行压缩或拉伸，设置为0，即获取原图
+     *             int ：maxHeight，同上
+     *             ScaleType ：显示的类型，居中，平铺等
+     *             Config：图片类型，如：Bitmap.Config.RGB_565
+     *             Response.ErrorListener： 获取图片失败的回调
+     */
+//    public void getImage(final int type, String imgUrl) {
+//        Log.i(TAG, "getImage: "+imgUrl);
+//        ImageRequest imgRequest = new ImageRequest(imgUrl, new Response.Listener<Bitmap>() {
+//            @Override
+//            public void onResponse(Bitmap response) {
+//                Log.i(TAG, "onResponse: image");
+//                Intent intent = new Intent(HomeActivity.HOME_BROADCAST);
+//                intent.putExtra("type", IMAGE);
+//                intent.putExtra("img_type",type);
+//                intent.putExtra("image", response);
+//                localBroadcastManager.sendBroadcast(intent);
+//            }
+//        }, 0, 0, ImageView.ScaleType.CENTER, Bitmap.Config.RGB_565, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//
+//            }
+//        });
+//        MyApplication.getHttpQueues().add(imgRequest);
+//    }
 
 }
