@@ -50,6 +50,12 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:id="@+id/iv_submit"
+                />
+
             <Button
                 android:id="@+id/btn_submit"
                 style="?android:textAppearanceSmall"
@@ -57,6 +63,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_submit"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_add_image"
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/action_add_image"
                 android:textStyle="bold" />
 
         </LinearLayout>

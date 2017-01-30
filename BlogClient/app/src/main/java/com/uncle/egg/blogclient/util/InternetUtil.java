@@ -3,16 +3,16 @@ package com.uncle.egg.blogclient.util;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Base64;
 import android.util.Log;
-import android.widget.ImageView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 import com.uncle.egg.blogclient.MyApplication;
@@ -22,9 +22,15 @@ import com.uncle.egg.blogclient.bean.BlogJson;
 import com.uncle.egg.blogclient.bean.LoginJson;
 import com.uncle.egg.blogclient.bean.Results;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+
 
 /**
  * Created by egguncle on 17-1-17.
@@ -46,7 +52,7 @@ public class InternetUtil {
 
     //登录用的URL  POST  参数 userName passwd
     private final static String URL_LOGIN = URL_BASE + "/api/client_login";
-    //发布博客用的URL POST 参数 userId title content
+    //发布博客用的URL POST 参数 userId title content imageFile
     private final static String URL_SUMBIT_BLOG = URL_BASE + "/api/submit_blog";
 
     //图片请求时使用的参数
@@ -69,6 +75,7 @@ public class InternetUtil {
     private static int minId;
 
     private LocalBroadcastManager localBroadcastManager;
+
 
 
     public InternetUtil(LocalBroadcastManager localBroadcastManager) {
@@ -227,7 +234,7 @@ public class InternetUtil {
      * @param title
      * @param content
      */
-    public void submitBlog(final String userId, final String title, final String content) {
+    public void submitBlog(final String userId, final String title, final String content, final String imagePath ,final String imageType) {
         StringRequest submitRequest = new StringRequest(Request.Method.POST, URL_SUMBIT_BLOG, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -246,6 +253,13 @@ public class InternetUtil {
                 params.put("userId", userId + "");
                 params.put("title", title);
                 params.put("content", content);
+                String base64StrOfImg="";
+                if (!"".equals(imagePath)){
+                    base64StrOfImg = getImageStr(imagePath);
+                }
+
+                params.put("base64StrOfImg",base64StrOfImg);
+                params.put("imgtype",imageType);
 
                 return params;
             }
@@ -253,6 +267,26 @@ public class InternetUtil {
         MyApplication.getHttpQueues().add(submitRequest);
     }
 
+
+    /**
+     * 图片转化成base64字符串
+     * @param imagePath
+     * @return
+     */
+    public String getImageStr(String imagePath)
+    {//将图片文件转化为字节数组字符串，并对其进行Base64编码处理
+        //decode to bitmap
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+        //convert to byte array
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] bytes = baos.toByteArray();
+
+        //base64 encode
+        byte[] encode = Base64.encode(bytes,Base64.DEFAULT);
+        String encodeString = new String(encode);
+        return encodeString;//返回Base64编码过的字节数组字符串
+    }
 
     /**
      * 获取图片的类，暂时用来获取侧划菜单的icon和bg
