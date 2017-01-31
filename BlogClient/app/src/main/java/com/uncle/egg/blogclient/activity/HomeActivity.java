@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.uncle.egg.blogclient.R;
@@ -68,6 +69,10 @@ public class HomeActivity extends AppCompatActivity
 
     private List<Results> listBlog;
     private RcvAdapterHomePage rcvAdapterHomePage;
+
+    //用于下拉刷新
+    private LinearLayoutManager linearLayoutManager;
+    private int lastVisibleItem;
 
     private SPUtil spUtil;
 
@@ -113,7 +118,8 @@ public class HomeActivity extends AppCompatActivity
 
         rshHome = (SwipeRefreshLayout) findViewById(R.id.rsh_home);
         rcvHome = (RecyclerView) findViewById(R.id.rcv_home);
-        rcvHome.setLayoutManager(new LinearLayoutManager(this));
+        linearLayoutManager = new LinearLayoutManager(this);
+        rcvHome.setLayoutManager(linearLayoutManager);
         rcvHome.setItemAnimator(new DefaultItemAnimator());
 
     }
@@ -145,6 +151,30 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
+        //rcv滚动监听，在向下浏览信息的时候及时发送请求获取新的数据
+        rcvHome.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                //0：当前屏幕停止滚动；1时：屏幕在滚动 且 用户仍在触碰或手指还在屏幕上；2时：随用户的操作，屏幕上产生的惯性滑动；
+                // 滑动状态停止并且剩余少于两个item时，自动加载下一页
+                if (newState == RecyclerView.SCROLL_STATE_IDLE
+                        && lastVisibleItem + 2 >= linearLayoutManager.getItemCount()) {
+                    if (listBlog!=null&&listBlog.size()!=0){
+                        //获取最后一条博客内容的id
+                        int lastBlogId = listBlog.get(listBlog.size() - 1).getBlogId();
+                        internetUtil.getBlog(listBlog, InternetUtil.GET_MORE_MIN,lastBlogId);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+            }
+        });
 
     }
 
@@ -160,7 +190,7 @@ public class HomeActivity extends AppCompatActivity
 
         //rcv相关
         listBlog = new ArrayList<>();
-        rcvAdapterHomePage = new RcvAdapterHomePage(listBlog,this);
+        rcvAdapterHomePage = new RcvAdapterHomePage(listBlog, this);
         rcvHome.setAdapter(rcvAdapterHomePage);
 
 
@@ -296,6 +326,11 @@ public class HomeActivity extends AppCompatActivity
                 rshHome.setRefreshing(false);
                 rcvAdapterHomePage.notifyDataSetChanged();
 
+                //若新请求到的list为空，说明没有数据了
+                boolean isNull=intent.getBooleanExtra("isNull",true);
+                if (isNull){
+                    Toast.makeText(context,"已经到底啦",Toast.LENGTH_SHORT).show();
+                }
             }
 
         }

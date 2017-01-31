@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 
-
 /**
  * Created by egguncle on 17-1-17.
  */
@@ -75,7 +74,6 @@ public class InternetUtil {
     private static int minId;
 
     private LocalBroadcastManager localBroadcastManager;
-
 
 
     public InternetUtil(LocalBroadcastManager localBroadcastManager) {
@@ -134,15 +132,23 @@ public class InternetUtil {
                 //上述步骤转移至服务器中运行，但是仍然要注意
                 //  Collections.reverse(blogJson.getResults());
                 //    listBlog.addAll(blogJson.getResults());
-                listBlog.addAll(0, blogJson.getResults());
+                List<Results> resultsList=blogJson.getResults();
+                listBlog.addAll(0, resultsList);
 
                 //获取bloglist最大和最小ID，已备后续的使用
                 maxId = listResults.get(0).getBlogId();
                 minId = listResults.get(listResults.size() - 1).getBlogId();
 
-
+                //当前list中的blog的最大和最小id
                 intent.putExtra("maxId", maxId);
                 intent.putExtra("minId", minId);
+
+                //是否请求到了新的数据
+                if (resultsList==null||resultsList.size()==0){
+                    intent.putExtra("isNull",true);
+                }else{
+                    intent.putExtra("isNull",false);
+                }
 
                 //发送广播给HomeActivity，更新adapter
                 localBroadcastManager.sendBroadcast(intent);
@@ -234,7 +240,7 @@ public class InternetUtil {
      * @param title
      * @param content
      */
-    public void submitBlog(final String userId, final String title, final String content, final String imagePath ,final String imageType) {
+    public void submitBlog(final String userId, final String title, final String content, final String imagePath, final String imageType) {
         StringRequest submitRequest = new StringRequest(Request.Method.POST, URL_SUMBIT_BLOG, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -253,13 +259,13 @@ public class InternetUtil {
                 params.put("userId", userId + "");
                 params.put("title", title);
                 params.put("content", content);
-                String base64StrOfImg="";
-                if (!"".equals(imagePath)){
+                String base64StrOfImg = "";
+                if (!"".equals(imagePath)) {
                     base64StrOfImg = getImageStr(imagePath);
                 }
 
-                params.put("base64StrOfImg",base64StrOfImg);
-                params.put("imgtype",imageType);
+                params.put("base64StrOfImg", base64StrOfImg);
+                params.put("imgtype", imageType);
 
                 return params;
             }
@@ -270,11 +276,11 @@ public class InternetUtil {
 
     /**
      * 图片转化成base64字符串
+     *
      * @param imagePath
      * @return
      */
-    public String getImageStr(String imagePath)
-    {//将图片文件转化为字节数组字符串，并对其进行Base64编码处理
+    public String getImageStr(String imagePath) {//将图片文件转化为字节数组字符串，并对其进行Base64编码处理
         //decode to bitmap
         Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
         //convert to byte array
@@ -283,7 +289,7 @@ public class InternetUtil {
         byte[] bytes = baos.toByteArray();
 
         //base64 encode
-        byte[] encode = Base64.encode(bytes,Base64.DEFAULT);
+        byte[] encode = Base64.encode(bytes, Base64.DEFAULT);
         String encodeString = new String(encode);
         return encodeString;//返回Base64编码过的字节数组字符串
     }
