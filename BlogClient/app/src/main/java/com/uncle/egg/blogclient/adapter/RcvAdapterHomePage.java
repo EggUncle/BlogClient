@@ -63,6 +63,7 @@ public class RcvAdapterHomePage extends RecyclerView.Adapter<RcvAdapterHomePage.
         String urlPath = listBlog.get(position).getImgPath();
         //拼接出完整的图片地址
         urlPath = InternetUtil.URL_BASE + urlPath;
+        Log.i(TAG, "onResourceReady: "+urlPath);
         //使用tag标记item，来防止图片错乱
         //获取tag
         String tag = (String) holder.imgBlogBg.getTag();

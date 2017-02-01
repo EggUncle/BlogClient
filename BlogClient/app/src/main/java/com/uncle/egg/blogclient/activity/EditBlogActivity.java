@@ -90,8 +90,8 @@ public class EditBlogActivity extends BaseAcitvity {
                 InternetUtil internetUtil = new InternetUtil();
                 String title = edTitle.getEditText().getText().toString();
                 String content = edContent.getEditText().getText().toString();
-                String imageType = null;
-                if ("".equals(imagePath)) {
+                String imageType = "";
+                if (!"".equals(imagePath)) {
                     //图片类型
                     imageType = imagePath.substring(imagePath.indexOf(".") + 1);
                     Log.i(TAG, "onClick: " + imageType);

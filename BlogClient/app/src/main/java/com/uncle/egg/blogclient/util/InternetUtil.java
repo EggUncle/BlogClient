@@ -39,20 +39,20 @@ public class InternetUtil {
 
     private final static String TAG = "InternetUtil";
 
-    public final static String URL_BASE = "http://192.168.1.106:8080";
+    public final static String URL_BASE = "http://192.168.1.106:8080/";
 
     //获取单条博客的URL  GET   ex:http://localhost:8080/json/blog/one/20
-    private final static String URL_ONE_BLOG = URL_BASE + "/api/blog/one/";
+    private final static String URL_ONE_BLOG = URL_BASE + "api/blog/one/";
     //获取比该ID更大的博客的URL （20条）GET     ex:http://localhost:8080/json/blog/max/20
-    private final static String URL_MAX_BLOG = URL_BASE + "/api/blog/max/";
+    private final static String URL_MAX_BLOG = URL_BASE + "api/blog/max/";
     //获取比该ID更小的博客的URL  （20条）GET     ex:http://localhost:8080/json/blog/min/20
-    private final static String URL_MIN_BLOG = URL_BASE + "/api/blog/min/";
+    private final static String URL_MIN_BLOG = URL_BASE + "api/blog/min/";
 
 
     //登录用的URL  POST  参数 userName passwd
-    private final static String URL_LOGIN = URL_BASE + "/api/client_login";
+    private final static String URL_LOGIN = URL_BASE + "api/client_login";
     //发布博客用的URL POST 参数 userId title content imageFile
-    private final static String URL_SUMBIT_BLOG = URL_BASE + "/api/submit_blog";
+    private final static String URL_SUMBIT_BLOG = URL_BASE + "api/submit_blog";
 
     //图片请求时使用的参数
     //请求头像图片
@@ -263,14 +263,18 @@ public class InternetUtil {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("userId", userId + "");
+                Log.i(TAG, "getParams: "+userId);
+                params.put("userId", userId);
                 params.put("title", title);
                 params.put("content", content);
-                String base64StrOfImg =  "";
-
+                String base64StrOfImg = "";
+//
                 if (!"".equals(imagePath)) {
                     base64StrOfImg = getImageStr(imagePath);
                 }
+
+             //   Log.i(TAG, "getParams: "+base64StrOfImg);
+//
                 params.put("base64StrOfImg", base64StrOfImg);
                 params.put("imgtype", imageType);
 
