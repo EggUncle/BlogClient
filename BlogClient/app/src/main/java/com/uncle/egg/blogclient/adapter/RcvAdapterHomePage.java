@@ -2,8 +2,10 @@ package com.uncle.egg.blogclient.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.uncle.egg.blogclient.R;
 import com.uncle.egg.blogclient.activity.DetailsActivity;
 import com.uncle.egg.blogclient.activity.HomeActivity;
@@ -32,9 +38,9 @@ public class RcvAdapterHomePage extends RecyclerView.Adapter<RcvAdapterHomePage.
     private List<Results> listBlog;
     private Context mContext;
 
-    private final static String BASE_URL="";
+    private final static String BASE_URL = "";
 
-    private final static String TAG="RcvAdapterHomePage";
+    private final static String TAG = "RcvAdapterHomePage";
 
     public RcvAdapterHomePage(List<Results> listData, Context context) {
         this.listBlog = listData;
@@ -54,21 +60,31 @@ public class RcvAdapterHomePage extends RecyclerView.Adapter<RcvAdapterHomePage.
         holder.tvTitle.setText(listBlog.get(position).getBlogTitle());
         holder.tvDate.setText(listBlog.get(position).getBlogDate());
 
-
         String urlPath = listBlog.get(position).getImgPath();
-
-
-        if (urlPath!=null) {
-            urlPath=InternetUtil.URL_BASE+urlPath;
-            Log.i(TAG, "onBindViewHolder: "+urlPath);
-            Glide.with(mContext)
-                    .load(urlPath)
-                    //  .override(100, 100)
-                    .centerCrop()
-                    // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
-                    .into(holder.imgBlogBg);
-
+        //拼接出完整的图片地址
+        urlPath = InternetUtil.URL_BASE + urlPath;
+        //使用tag标记item，来防止图片错乱
+        //获取tag
+        String tag = (String) holder.imgBlogBg.getTag();
+        //若url和tag不同，则不加载图片
+        if (!TextUtils.equals(urlPath, tag)) {
+            //加载默认图片
+            holder.imgBlogBg.setImageResource(R.drawable.default_img);
         }
+        final String finalUrlPath = urlPath;
+        //加载图片并给图片设置tag
+        Glide.with(mContext).load(finalUrlPath).asBitmap().centerCrop().placeholder(R.drawable.default_img)
+                .error(R.drawable.default_img).into(new SimpleTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap>
+                    glideAnimation) {
+                Log.i(TAG, "onResourceReady: "+finalUrlPath);
+                //设置tag
+                holder.imgBlogBg.setTag(finalUrlPath);
+                //加载图片
+                holder.imgBlogBg.setImageBitmap(resource);
+            }
+        });
         //rcv对应的点击事件，点击后进入详情页面，并且传入对应的博客对象
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

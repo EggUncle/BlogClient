@@ -91,18 +91,21 @@ public class InternetUtil {
      * @param type
      * @param blogId
      */
-    public void getBlog(final List<Results> listBlog, int type, int blogId) {
+    public void getBlog(final List<Results> listBlog, final int type, int blogId) {
         String URL_BLOG = null;
 
         switch (type) {
             case GET_ONE:
                 URL_BLOG = URL_ONE_BLOG + blogId;
+                Log.i(TAG, "getBlog: get a blog");
                 break;
             case GET_MORE_MAX:
                 URL_BLOG = URL_MAX_BLOG + blogId;
+                Log.i(TAG, "getBlog: get more max blog");
                 break;
             case GET_MORE_MIN:
                 URL_BLOG = URL_MIN_BLOG + blogId;
+                Log.i(TAG, "getBlog: get more min blog");
                 break;
             default:
                 URL_BLOG = URL_ONE_BLOG + blogId;
@@ -133,7 +136,11 @@ public class InternetUtil {
                 //  Collections.reverse(blogJson.getResults());
                 //    listBlog.addAll(blogJson.getResults());
                 List<Results> resultsList=blogJson.getResults();
-                listBlog.addAll(0, resultsList);
+                if (type==GET_MORE_MAX){
+                listBlog.addAll(0, resultsList);}
+                if (type==GET_MORE_MIN){
+                    listBlog.addAll(resultsList);
+                }
 
                 //获取bloglist最大和最小ID，已备后续的使用
                 maxId = listResults.get(0).getBlogId();
@@ -234,7 +241,7 @@ public class InternetUtil {
 
 
     /**
-     * 发送博客的方法
+     * 提交博客的方法
      *
      * @param userId
      * @param title
@@ -259,11 +266,11 @@ public class InternetUtil {
                 params.put("userId", userId + "");
                 params.put("title", title);
                 params.put("content", content);
-                String base64StrOfImg = "";
+                String base64StrOfImg =  "";
+
                 if (!"".equals(imagePath)) {
                     base64StrOfImg = getImageStr(imagePath);
                 }
-
                 params.put("base64StrOfImg", base64StrOfImg);
                 params.put("imgtype", imageType);
 

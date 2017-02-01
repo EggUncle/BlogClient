@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
@@ -22,6 +24,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -122,6 +126,16 @@ public class HomeActivity extends AppCompatActivity
         rcvHome.setLayoutManager(linearLayoutManager);
         rcvHome.setItemAnimator(new DefaultItemAnimator());
 
+        //设置状态栏为透明
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.TRANSPARENT);
+        }
+
+
     }
 
     private void initAction() {
@@ -157,13 +171,14 @@ public class HomeActivity extends AppCompatActivity
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 //0：当前屏幕停止滚动；1时：屏幕在滚动 且 用户仍在触碰或手指还在屏幕上；2时：随用户的操作，屏幕上产生的惯性滑动；
-                // 滑动状态停止并且剩余少于两个item时，自动加载下一页
+                // 滑动状态停止并且剩余少于5个item时，自动加载下一页
                 if (newState == RecyclerView.SCROLL_STATE_IDLE
-                        && lastVisibleItem + 2 >= linearLayoutManager.getItemCount()) {
-                    if (listBlog!=null&&listBlog.size()!=0){
+                        && lastVisibleItem + 5 >= linearLayoutManager.getItemCount()) {
+                    if (listBlog != null && listBlog.size() != 0) {
                         //获取最后一条博客内容的id
-                        int lastBlogId = listBlog.get(listBlog.size() - 1).getBlogId();
-                        internetUtil.getBlog(listBlog, InternetUtil.GET_MORE_MIN,lastBlogId);
+                        //int lastBlogId = listBlog.get(listBlog.size() - 1).getBlogId();
+
+                        internetUtil.getBlog(listBlog, InternetUtil.GET_MORE_MIN, minId);
                     }
 
                 }
@@ -316,8 +331,15 @@ public class HomeActivity extends AppCompatActivity
 
             //若收到的是博客相关的广播
             if (type == InternetUtil.BLOG) {
-                maxId = intent.getIntExtra("maxId", maxId);
-                minId = intent.getIntExtra("minId", minId);
+                int mMaxId = intent.getIntExtra("maxId", maxId);
+                int mMinId = intent.getIntExtra("minId", minId);
+                if (mMaxId > maxId && maxId != 0 || maxId == 0) {
+                    maxId = mMaxId;
+                }
+                if (mMinId < minId && minId != 0 || minId == 0) {
+                    minId = mMinId;
+                }
+
 
                 Log.i(TAG, "onReceive: listSize" + listBlog.size());
                 Log.i(TAG, "onReceive: maxId" + maxId);
@@ -327,9 +349,9 @@ public class HomeActivity extends AppCompatActivity
                 rcvAdapterHomePage.notifyDataSetChanged();
 
                 //若新请求到的list为空，说明没有数据了
-                boolean isNull=intent.getBooleanExtra("isNull",true);
-                if (isNull){
-                    Toast.makeText(context,"已经到底啦",Toast.LENGTH_SHORT).show();
+                boolean isNull = intent.getBooleanExtra("isNull", true);
+                if (isNull) {
+                    Toast.makeText(context, "没有数据了", Toast.LENGTH_SHORT).show();
                 }
             }
 
