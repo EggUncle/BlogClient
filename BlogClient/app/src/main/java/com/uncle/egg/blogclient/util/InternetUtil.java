@@ -70,8 +70,8 @@ public class InternetUtil {
     public final static int GET_MORE_MIN = 2;
     public final static int GET_ONE = 0;
 
-    private static int maxId;
-    private static int minId;
+    private  int maxId;
+    private  int minId;
 
     private LocalBroadcastManager localBroadcastManager;
 
@@ -84,37 +84,63 @@ public class InternetUtil {
     }
 
 
+
+
+    /**
+     * 构造请求需要的URL
+     * /api/blog/{type}/{userId}/{blogId}
+     *
+     * @param type   类型：获取更大/更小/单条 博客
+     * @param blogId 博客id
+     * @param userId 用户id
+     */
+    public String makeUrl(int type, int blogId, int userId) {
+        String blogUrl = "";
+
+        switch (type) {
+            case GET_ONE:
+                blogUrl = URL_ONE_BLOG + blogId;
+                Log.i(TAG, "getBlog: get a blog");
+                break;
+            case GET_MORE_MAX:
+                if (userId == 0) {
+                    blogUrl = URL_MAX_BLOG + blogId;
+                } else {
+                    blogUrl = URL_MAX_BLOG + userId + "/" + blogId;
+                }
+
+                Log.i(TAG, "getBlog: get more max blog");
+                break;
+            case GET_MORE_MIN:
+                if (userId == 0) {
+                    blogUrl = URL_MIN_BLOG + blogId;
+                } else {
+                    blogUrl = URL_MIN_BLOG + userId + "/" + blogId;
+                }
+                Log.i(TAG, "getBlog: get more min blog");
+                break;
+            default:
+                blogUrl = URL_ONE_BLOG + blogId;
+                break;
+        }
+
+        return blogUrl;
+    }
+
+    public String makeUrl(int type, int blogId) {
+        return makeUrl(type, blogId, 0);
+    }
+
     /**
      * 获取博客数据 默认使用URL_MAX_BLOG ID为0
      *
      * @param listBlog
-     * @param type
-     * @param blogId
+     * @param blogUrl  请求的url
      */
-    public void getBlog(final List<Results> listBlog, final int type, int blogId) {
-        String URL_BLOG = null;
+    public void getBlog(final List<Results> listBlog, String blogUrl) {
 
-        switch (type) {
-            case GET_ONE:
-                URL_BLOG = URL_ONE_BLOG + blogId;
-                Log.i(TAG, "getBlog: get a blog");
-                break;
-            case GET_MORE_MAX:
-                URL_BLOG = URL_MAX_BLOG + blogId;
-                Log.i(TAG, "getBlog: get more max blog");
-                break;
-            case GET_MORE_MIN:
-                URL_BLOG = URL_MIN_BLOG + blogId;
-                Log.i(TAG, "getBlog: get more min blog");
-                break;
-            default:
-                URL_BLOG = URL_ONE_BLOG + blogId;
-                break;
-        }
-
-
-        Log.i(TAG, "getBlog: " + URL_BLOG);
-        StringRequest requestBlog = new StringRequest(Request.Method.GET, URL_BLOG, new Response.Listener<String>() {
+        Log.i(TAG, "getBlog: " + blogUrl);
+        StringRequest requestBlog = new StringRequest(Request.Method.GET, blogUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //解析数据
@@ -125,37 +151,53 @@ public class InternetUtil {
 
                 Intent intent = new Intent(HomeActivity.HOME_BROADCAST);
                 intent.putExtra("type", BLOG);
+                //是否请求到了新的数据
                 //若结果为空，直接返回
                 if (listResults == null || listResults.size() == 0) {
+                    intent.putExtra("isNull", true);
                     localBroadcastManager.sendBroadcast(intent);
                     return;
+                } else {
+                    intent.putExtra("isNull", false);
                 }
 
                 //反转获取到的list数据，使其更符合阅读习惯（上面是新的下面的旧的）
                 //上述步骤转移至服务器中运行，但是仍然要注意
                 //  Collections.reverse(blogJson.getResults());
                 //    listBlog.addAll(blogJson.getResults());
-                List<Results> resultsList=blogJson.getResults();
-                if (type==GET_MORE_MAX){
-                listBlog.addAll(0, resultsList);}
-                if (type==GET_MORE_MIN){
-                    listBlog.addAll(resultsList);
+                // List<Results> list = blogJson.getResults();
+
+                //获取请求到的结果中第一条博客数据的ID，以此判断请求是去获取了更新的博客还是更旧的博客
+                int id = listResults.get(0).getBlogId();
+
+                if (listBlog.size()!=0){
+                    //获取bloglist当前最大和最小ID，已备后续的使用
+                    maxId = listBlog.get(0).getBlogId();
+                    minId = listBlog.get(listResults.size() - 1).getBlogId();
+
+                }else{
+                    maxId=0;
                 }
 
-                //获取bloglist最大和最小ID，已备后续的使用
-                maxId = listResults.get(0).getBlogId();
-                minId = listResults.get(listResults.size() - 1).getBlogId();
+                if (id > maxId) {
+                    listBlog.addAll(0, listResults);
+                }
+                if (id < minId) {
+                    listBlog.addAll(listResults);
+                }
+
+                //再次获取bloglist当前最大和最小ID，已备后续的使用
+                maxId = listBlog.get(0).getBlogId();
+                minId = listBlog.get(listBlog.size() - 1).getBlogId();
+
+                Log.i(TAG, "onResponse: maxid is "+maxId);
+                Log.i(TAG, "onResponse: minid is "+minId);
 
                 //当前list中的blog的最大和最小id
                 intent.putExtra("maxId", maxId);
                 intent.putExtra("minId", minId);
 
-                //是否请求到了新的数据
-                if (resultsList==null||resultsList.size()==0){
-                    intent.putExtra("isNull",true);
-                }else{
-                    intent.putExtra("isNull",false);
-                }
+
 
                 //发送广播给HomeActivity，更新adapter
                 localBroadcastManager.sendBroadcast(intent);
@@ -171,15 +213,20 @@ public class InternetUtil {
         MyApplication.getHttpQueues().add(requestBlog);
     }
 
+
+//    public void getBlog(final List<Results> listBlog, final int type, int blogId) {
+//        getBlog(listBlog, type, blogId, 0);
+//    }
+
     /**
      * 当getblog方法没有指定blogID时，将ID设置为0
      *
      * @param listBlog
      * @param type
      */
-    public void getBlog(List<Results> listBlog, int type) {
-        getBlog(listBlog, type, 0);
-    }
+    //public void getBlog(List<Results> listBlog, int type) {
+    //       getBlog(listBlog, type, 0);
+    //   }
 
     /**
      * 登录使用的方法
@@ -263,7 +310,7 @@ public class InternetUtil {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                Log.i(TAG, "getParams: "+userId);
+                Log.i(TAG, "getParams: " + userId);
                 params.put("userId", userId);
                 params.put("title", title);
                 params.put("content", content);
@@ -273,7 +320,7 @@ public class InternetUtil {
                     base64StrOfImg = getImageStr(imagePath);
                 }
 
-             //   Log.i(TAG, "getParams: "+base64StrOfImg);
+                //   Log.i(TAG, "getParams: "+base64StrOfImg);
 //
                 params.put("base64StrOfImg", base64StrOfImg);
                 params.put("imgtype", imageType);

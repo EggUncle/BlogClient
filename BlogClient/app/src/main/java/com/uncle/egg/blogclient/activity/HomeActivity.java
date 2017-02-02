@@ -62,13 +62,14 @@ public class HomeActivity extends AppCompatActivity
     private TextView tvName;
     private TextView tvDescription;
     private ImageView imgBg;
-
     private View headerView;
 
-
+    //广播相关
     private HomeActivity.BlogJsonReceiver blogJsonReceiver;
     private LocalBroadcastManager localBroadcastManager;
     private IntentFilter intentFilter;
+
+    //网络请求工具类
     private InternetUtil internetUtil;
 
     private List<Results> listBlog;
@@ -86,6 +87,12 @@ public class HomeActivity extends AppCompatActivity
     private int maxId = 0;
     private int minId = 0;
 
+    //设置浏览数据的类型，浏览公共博客/自己的博客
+    private final static int PUBLIC_BLOG = 1;
+    private final static int MY_BLOG = 2;
+
+    //浏览数据的方式，默认为浏览公共博客
+    private int nowMode = PUBLIC_BLOG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,7 +159,17 @@ public class HomeActivity extends AppCompatActivity
         rshHome.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                internetUtil.getBlog(listBlog, InternetUtil.GET_MORE_MAX, maxId);
+                String url="";
+                if (nowMode==PUBLIC_BLOG){
+                    url = internetUtil.makeUrl(InternetUtil.GET_MORE_MAX, maxId);
+                }
+                if (nowMode==MY_BLOG){
+                    int userId=Integer.parseInt(spUtil.getUserId());
+                    url = internetUtil.makeUrl(InternetUtil.GET_MORE_MAX, maxId,userId);
+                }
+
+
+                internetUtil.getBlog(listBlog, url);
             }
         });
 
@@ -175,10 +192,18 @@ public class HomeActivity extends AppCompatActivity
                 if (newState == RecyclerView.SCROLL_STATE_IDLE
                         && lastVisibleItem + 5 >= linearLayoutManager.getItemCount()) {
                     if (listBlog != null && listBlog.size() != 0) {
-                        //获取最后一条博客内容的id
-                        //int lastBlogId = listBlog.get(listBlog.size() - 1).getBlogId();
 
-                        internetUtil.getBlog(listBlog, InternetUtil.GET_MORE_MIN, minId);
+                        //根据当前模式来构造URL
+                        String url="";
+                        if (nowMode==PUBLIC_BLOG){
+                            url = internetUtil.makeUrl(InternetUtil.GET_MORE_MIN, minId);
+                        }
+                        if (nowMode==MY_BLOG){
+                            int userId=Integer.parseInt(spUtil.getUserId());
+                            url = internetUtil.makeUrl(InternetUtil.GET_MORE_MIN, minId,userId);
+                        }
+                     //   String url = internetUtil.makeUrl(InternetUtil.GET_MORE_MIN, minId);
+                        internetUtil.getBlog(listBlog, url);
                     }
 
                 }
@@ -296,18 +321,36 @@ public class HomeActivity extends AppCompatActivity
 //        return true;
 //    }
 
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-            Log.i(TAG, "onNavigationItemSelected: fdasfdsafd");
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_public) {
+            //点击公共选项时，若当前模式不是公共，则清除整个列表，重新请求一次获取公共博客
+            if (nowMode != PUBLIC_BLOG) {
+                //清空博客数据
+                clearBlogList();
+                //设置当前模式为public blog
+                nowMode = PUBLIC_BLOG;
+            }
+        } else if (id == R.id.nav_my_blog) {
+            //先判断用户是否登录
+            // SPUtil spUtil = SPUtil.getInstance(HomeActivity.this);
+            int userId = Integer.parseInt(spUtil.getUserId());
+            if (userId == 0) {
+                Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
 
+            } else {
+                //点击个人选项时，若当前模式不是个人，则清除整个列表，重新请求一次获取个人博客
+                if (nowMode != MY_BLOG) {
+                    //清空博客数据
+                    clearBlogList();
+                    //设置当前模式为myblog
+                    nowMode = MY_BLOG;
+                }
+            }
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -323,6 +366,19 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
+
+    /**
+     * 清空当前博客数据，用于模式切换时使用
+     */
+    public void clearBlogList(){
+        //清空list的数据，刷新adapter
+        listBlog.clear();
+        rcvAdapterHomePage.notifyDataSetChanged();
+        //清空当前博客maxid minid数据
+        maxId=0;
+        minId=0;
+    }
+
     private class BlogJsonReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -331,28 +387,37 @@ public class HomeActivity extends AppCompatActivity
 
             //若收到的是博客相关的广播
             if (type == InternetUtil.BLOG) {
+                //停止刷新动画
+                rshHome.setRefreshing(false);
+                //若新请求到的list为空，说明没有数据了
+                boolean isNull = intent.getBooleanExtra("isNull", true);
+                if (isNull) {
+                    Toast.makeText(context, "没有数据了", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 int mMaxId = intent.getIntExtra("maxId", maxId);
                 int mMinId = intent.getIntExtra("minId", minId);
+
+                Log.i(TAG, "onReceive: MAXID IS " + mMaxId);
+                Log.i(TAG, "onReceive: MINID IS " + mMinId);
+
                 if (mMaxId > maxId && maxId != 0 || maxId == 0) {
+                    Log.i(TAG, "onReceive: get bigger id");
                     maxId = mMaxId;
                 }
                 if (mMinId < minId && minId != 0 || minId == 0) {
+                    Log.i(TAG, "onReceive: get smaller id");
                     minId = mMinId;
                 }
-
 
                 Log.i(TAG, "onReceive: listSize" + listBlog.size());
                 Log.i(TAG, "onReceive: maxId" + maxId);
                 Log.i(TAG, "onReceive: minId" + minId);
 
-                rshHome.setRefreshing(false);
                 rcvAdapterHomePage.notifyDataSetChanged();
 
-                //若新请求到的list为空，说明没有数据了
-                boolean isNull = intent.getBooleanExtra("isNull", true);
-                if (isNull) {
-                    Toast.makeText(context, "没有数据了", Toast.LENGTH_SHORT).show();
-                }
+
             }
 
         }

@@ -45,26 +45,26 @@ public class TestActivity extends BaseAcitvity {
 
         final List<Results> testList=new ArrayList<>();
 
-        btn1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                InternetUtil internetUtil=new InternetUtil();
-                internetUtil.getBlog(testList,InternetUtil.GET_ONE,20);
-            }
-        });
-        btn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                InternetUtil internetUtil=new InternetUtil();
-                internetUtil.getBlog(testList,InternetUtil.GET_MORE_MAX,20);
-            }
-        });
-        btn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                InternetUtil internetUtil=new InternetUtil();
-                internetUtil.getBlog(testList,InternetUtil.GET_MORE_MIN,20);
-            }
-        });
+//        btn1.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                InternetUtil internetUtil=new InternetUtil();
+//                internetUtil.getBlog(testList,InternetUtil.GET_ONE,20);
+//            }
+//        });
+//        btn2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                InternetUtil internetUtil=new InternetUtil();
+//                internetUtil.getBlog(testList,InternetUtil.GET_MORE_MAX,20);
+//            }
+//        });
+//        btn3.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                InternetUtil internetUtil=new InternetUtil();
+//                internetUtil.getBlog(testList,InternetUtil.GET_MORE_MIN,20);
+//            }
+//        });
     }
 }

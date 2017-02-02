@@ -87,6 +87,12 @@ public class EditBlogActivity extends BaseAcitvity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //从sp中取出用户id，若id为默认值，则说明没有登录
+                SPUtil sp = SPUtil.getInstance(EditBlogActivity.this);
+                String userId = sp.getUserId();
+                if ("0".equals(userId)){
+                    return;
+                }
                 InternetUtil internetUtil = new InternetUtil();
                 String title = edTitle.getEditText().getText().toString();
                 String content = edContent.getEditText().getText().toString();

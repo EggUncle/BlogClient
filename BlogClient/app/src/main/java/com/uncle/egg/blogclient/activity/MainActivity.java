@@ -82,12 +82,12 @@ public class MainActivity extends BaseAcitvity {
     }
 
     private void initAction() {
-        rshHome.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                internetUtil.getBlog(listBlog,InternetUtil.GET_MORE_MAX,maxId);
-            }
-        });
+//        rshHome.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                internetUtil.getBlog(listBlog,InternetUtil.GET_MORE_MAX,maxId);
+//            }
+//        });
 
         fabHome.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,8 +95,6 @@ public class MainActivity extends BaseAcitvity {
                 startActivity(new Intent(MainActivity.this, EditBlogActivity.class));
             }
         });
-
-
 
     }
 
