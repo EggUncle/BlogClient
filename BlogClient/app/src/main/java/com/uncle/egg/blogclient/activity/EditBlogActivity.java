@@ -24,8 +24,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import com.uncle.egg.blogclient.R;
+import com.uncle.egg.blogclient.bean.TableUserByUserId;
 import com.uncle.egg.blogclient.util.InternetUtil;
 import com.uncle.egg.blogclient.util.SPUtil;
 
@@ -87,10 +89,12 @@ public class EditBlogActivity extends BaseAcitvity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //从sp中取出用户id，若id为默认值，则说明没有登录
+                //从sp中取出用户名，若为默认值，则说明没有登录
                 SPUtil sp = SPUtil.getInstance(EditBlogActivity.this);
-                String userId = sp.getUserId();
-                if ("0".equals(userId)){
+                String userName = sp.getUserName();
+                String userPassWd=sp.getUserPassWd();
+                if ("".equals(userName)){
+                    Toast.makeText(EditBlogActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 InternetUtil internetUtil = new InternetUtil();
@@ -103,7 +107,7 @@ public class EditBlogActivity extends BaseAcitvity {
                     Log.i(TAG, "onClick: " + imageType);
 
                 }
-                internetUtil.submitBlog(userId, title, content, imagePath, imageType);
+                internetUtil.submitBlog(userName,userPassWd, title, content, imagePath, imageType);
             }
         });
 

@@ -104,6 +104,7 @@ public class LoginActivity extends BaseAcitvity {
              //   Log.i(TAG, "onReceive: "+userInfo.getUserName());
                 Toast.makeText(context, "login success", Toast.LENGTH_SHORT).show();
                 TableUserByUserId userInfo=loginJson.getUserEntity();
+
                 SPUtil.getInstance(context);
                 SPUtil.saveUserInfo(userInfo);
                 finish();

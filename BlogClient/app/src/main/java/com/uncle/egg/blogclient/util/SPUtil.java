@@ -49,6 +49,7 @@ public class SPUtil {
         mEditor.putString("description", userInfo.getDescription());
         mEditor.putString("iconPath", userInfo.getIconPath());
         mEditor.putString("bgPath", userInfo.getBgPath());
+        mEditor.putString("userPassWd", userInfo.getUserPassWd());
 
         Log.i(TAG, "saveUserInfo: " + userInfo.getUsername() + "  " + userInfo.getUserId());
 
@@ -58,6 +59,11 @@ public class SPUtil {
     //获取用户ID
     public static String getUserId() {
         return mSharedPreferences.getString("userId", "0");
+    }
+
+    //获取用户密码
+    public static String getUserPassWd() {
+        return mSharedPreferences.getString("userPassWd", "");
     }
 
     //获取用户头像路径
@@ -71,13 +77,17 @@ public class SPUtil {
     }
 
     //获取用户昵称
-    public static String getNickName(){
-        return mSharedPreferences.getString("nickName","");
+    public static String getNickName() {
+        return mSharedPreferences.getString("nickName", "");
     }
 
     //获取用户描述
-    public static String getDescription(){
-        return mSharedPreferences.getString("description","");
+    public static String getDescription() {
+        return mSharedPreferences.getString("description", "");
     }
 
+    //获取用户名
+    public String getUserName() {
+        return mSharedPreferences.getString("userName", "");
+    }
 }

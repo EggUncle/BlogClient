@@ -21,6 +21,7 @@ import com.uncle.egg.blogclient.activity.LoginActivity;
 import com.uncle.egg.blogclient.bean.BlogJson;
 import com.uncle.egg.blogclient.bean.LoginJson;
 import com.uncle.egg.blogclient.bean.Results;
+import com.uncle.egg.blogclient.bean.TableUserByUserId;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -53,6 +54,8 @@ public class InternetUtil {
     private final static String URL_LOGIN = URL_BASE + "api/client_login";
     //发布博客用的URL POST 参数 userId title content imageFile
     private final static String URL_SUMBIT_BLOG = URL_BASE + "api/submit_blog";
+    //删除博客用的URL POST 参数 blogId username userpasswd
+    private  final  static String URL_DELETE_BLOG=URL_BASE+"api/blog/delete";
 
     //图片请求时使用的参数
     //请求头像图片
@@ -254,6 +257,11 @@ public class InternetUtil {
                 //将拼接出的图片地址设置给user
                 loginJson.getUserEntity().setBgPath(bgpath);
                 loginJson.getUserEntity().setIconPath(iconPath);
+                //将加密过的密码设置给user
+                //对密码进行MD5加密
+                CipherUtil cipherUtil = new CipherUtil();
+                String passwdByMd5 = cipherUtil.generatePassword(passwd);
+                loginJson.getUserEntity().setUserPassWd(passwdByMd5);
 
                 Intent intent = new Intent(LoginActivity.LOGIN_BROADCAST);
 
@@ -290,11 +298,14 @@ public class InternetUtil {
     /**
      * 提交博客的方法
      *
-     * @param userId
+     * @param userName
+     * @param userPassWd
      * @param title
      * @param content
+     * @param imagePath
+     * @param imageType
      */
-    public void submitBlog(final String userId, final String title, final String content, final String imagePath, final String imageType) {
+    public void submitBlog(final String userName,final String userPassWd, final String title, final String content, final String imagePath, final String imageType) {
         StringRequest submitRequest = new StringRequest(Request.Method.POST, URL_SUMBIT_BLOG, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -310,10 +321,11 @@ public class InternetUtil {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                Log.i(TAG, "getParams: " + userId);
-                params.put("userId", userId);
+
                 params.put("title", title);
                 params.put("content", content);
+                params.put("userName",userName);
+                params.put("userPassWd",userPassWd);
                 String base64StrOfImg = "";
 //
                 if (!"".equals(imagePath)) {
@@ -352,23 +364,23 @@ public class InternetUtil {
         return encodeString;//返回Base64编码过的字节数组字符串
     }
 
-    /**
-     * 获取图片的类，暂时用来获取侧划菜单的icon和bg
-     *
-     * @param type 想要获取的图片类型 icon 或 bg
-     *             <p>
-     *             <p>
-     *             注意：在构建ImageRequest实例时，需要传递七个参数（六个参数的重载方法已过时，少一个ScaleType参数）
-     *             这七个参数类型分别为：
-     *             <p>
-     *             String ： 要获取的图片地址
-     *             Response.Listener<Bitmap> ： 获取图片成功的回调
-     *             int： maxWidth，获取图片的最大宽度，会自动进行压缩或拉伸，设置为0，即获取原图
-     *             int ：maxHeight，同上
-     *             ScaleType ：显示的类型，居中，平铺等
-     *             Config：图片类型，如：Bitmap.Config.RGB_565
-     *             Response.ErrorListener： 获取图片失败的回调
-     */
+//    /**
+//     * 获取图片的类，暂时用来获取侧划菜单的icon和bg
+//     *
+//     * @param type 想要获取的图片类型 icon 或 bg
+//     *             <p>
+//     *             <p>
+//     *             注意：在构建ImageRequest实例时，需要传递七个参数（六个参数的重载方法已过时，少一个ScaleType参数）
+//     *             这七个参数类型分别为：
+//     *             <p>
+//     *             String ： 要获取的图片地址
+//     *             Response.Listener<Bitmap> ： 获取图片成功的回调
+//     *             int： maxWidth，获取图片的最大宽度，会自动进行压缩或拉伸，设置为0，即获取原图
+//     *             int ：maxHeight，同上
+//     *             ScaleType ：显示的类型，居中，平铺等
+//     *             Config：图片类型，如：Bitmap.Config.RGB_565
+//     *             Response.ErrorListener： 获取图片失败的回调
+//     */
 //    public void getImage(final int type, String imgUrl) {
 //        Log.i(TAG, "getImage: "+imgUrl);
 //        ImageRequest imgRequest = new ImageRequest(imgUrl, new Response.Listener<Bitmap>() {
@@ -389,5 +401,35 @@ public class InternetUtil {
 //        });
 //        MyApplication.getHttpQueues().add(imgRequest);
 //    }
+
+    /**
+     * 删除博客的方法，需要在登录状态下使用，需要验证用户名和密码
+     * @param blogId 需要删除的博客ID
+     * @param userName 当前用户的用户名
+     * @param userPassWd 当前用户的密码
+     */
+    public void deleteBlog(final int blogId, final String userName, final String userPassWd){
+        StringRequest deleteRequest=new StringRequest(Request.Method.POST, URL_DELETE_BLOG, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(TAG, "onResponse: deleteBlog " +response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params=new HashMap<>();
+                params.put("blogId",blogId+"");
+                params.put("userName",userName);
+                params.put("userPassWd",userPassWd);
+                return params;
+            }
+        };
+        MyApplication.getHttpQueues().add(deleteRequest);
+    }
 
 }

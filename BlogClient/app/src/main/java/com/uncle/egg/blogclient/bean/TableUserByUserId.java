@@ -21,6 +21,16 @@ public class TableUserByUserId implements Serializable{
 
     private String bgPath;
 
+    private String userPassWd;
+
+    public String getUserPassWd() {
+        return userPassWd;
+    }
+
+    public void setUserPassWd(String userPassWd) {
+        this.userPassWd = userPassWd;
+    }
+
     public void setUserId(int userId){
         this.userId = userId;
     }
