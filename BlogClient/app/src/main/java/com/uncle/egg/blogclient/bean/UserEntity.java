@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Created by egguncle on 17-1-17.
  */
 
-public class TableUserByUserId implements Serializable{
+public class UserEntity implements Serializable{
     private int userId;
 
     private String username;
@@ -21,15 +21,25 @@ public class TableUserByUserId implements Serializable{
 
     private String bgPath;
 
-    private String userPassWd;
-
-    public String getUserPassWd() {
-        return userPassWd;
+    public String getToken() {
+        return token;
     }
 
-    public void setUserPassWd(String userPassWd) {
-        this.userPassWd = userPassWd;
+    public void setToken(String token) {
+        this.token = token;
     }
+
+    private String token;
+
+//    private String userPassWd;
+//
+//    public String getUserPassWd() {
+//        return userPassWd;
+//    }
+//
+//    public void setUserPassWd(String userPassWd) {
+//        this.userPassWd = userPassWd;
+//    }
 
     public void setUserId(int userId){
         this.userId = userId;

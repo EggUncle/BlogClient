@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,7 +34,7 @@ import com.bumptech.glide.Glide;
 import com.uncle.egg.blogclient.R;
 import com.uncle.egg.blogclient.adapter.RcvAdapterHomePage;
 import com.uncle.egg.blogclient.bean.Results;
-import com.uncle.egg.blogclient.util.InternetUtil;
+import com.uncle.egg.blogclient.util.NetWorkUtil;
 import com.uncle.egg.blogclient.util.SPUtil;
 
 import java.util.ArrayList;
@@ -70,7 +69,7 @@ public class HomeActivity extends AppCompatActivity
     private IntentFilter intentFilter;
 
     //网络请求工具类
-    private InternetUtil internetUtil;
+    private NetWorkUtil internetUtil;
 
     private List<Results> listBlog;
     private RcvAdapterHomePage rcvAdapterHomePage;
@@ -161,11 +160,11 @@ public class HomeActivity extends AppCompatActivity
             public void onRefresh() {
                 String url="";
                 if (nowMode==PUBLIC_BLOG){
-                    url = internetUtil.makeUrl(InternetUtil.GET_MORE_MAX, maxId);
+                    url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MAX, maxId);
                 }
                 if (nowMode==MY_BLOG){
                     int userId=Integer.parseInt(spUtil.getUserId());
-                    url = internetUtil.makeUrl(InternetUtil.GET_MORE_MAX, maxId,userId);
+                    url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MAX, maxId,userId);
                 }
 
 
@@ -196,13 +195,13 @@ public class HomeActivity extends AppCompatActivity
                         //根据当前模式来构造URL
                         String url="";
                         if (nowMode==PUBLIC_BLOG){
-                            url = internetUtil.makeUrl(InternetUtil.GET_MORE_MIN, minId);
+                            url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MIN, minId);
                         }
                         if (nowMode==MY_BLOG){
                             int userId=Integer.parseInt(spUtil.getUserId());
-                            url = internetUtil.makeUrl(InternetUtil.GET_MORE_MIN, minId,userId);
+                            url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MIN, minId,userId);
                         }
-                     //   String url = internetUtil.makeUrl(InternetUtil.GET_MORE_MIN, minId);
+                     //   String url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MIN, minId);
                         internetUtil.getBlog(listBlog, url);
                     }
 
@@ -221,7 +220,7 @@ public class HomeActivity extends AppCompatActivity
     private void initData() {
         //广播相关
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        internetUtil = new InternetUtil(localBroadcastManager);
+        internetUtil = new NetWorkUtil(localBroadcastManager);
         intentFilter = new IntentFilter();
         intentFilter.addAction(HOME_BROADCAST);
 
@@ -248,6 +247,7 @@ public class HomeActivity extends AppCompatActivity
         if (!"".equals(iconImgUrl)) {
             Glide.with(HomeActivity.this)
                     .load(iconImgUrl)
+                    .error(R.mipmap.ic_launcher)
                     //  .override(100, 100)
                     .fitCenter()
                     // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
@@ -386,7 +386,7 @@ public class HomeActivity extends AppCompatActivity
             int type = intent.getIntExtra("type", 0);
 
             //若收到的是博客相关的广播
-            if (type == InternetUtil.BLOG) {
+            if (type == NetWorkUtil.BLOG) {
                 //停止刷新动画
                 rshHome.setRefreshing(false);
                 //若新请求到的list为空，说明没有数据了

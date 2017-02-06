@@ -16,23 +16,19 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.uncle.egg.blogclient.R;
-import com.uncle.egg.blogclient.bean.TableUserByUserId;
-import com.uncle.egg.blogclient.util.InternetUtil;
+import com.uncle.egg.blogclient.util.NetWorkUtil;
 import com.uncle.egg.blogclient.util.SPUtil;
 
 import java.io.ByteArrayOutputStream;
-import java.lang.annotation.Target;
 
 public class EditBlogActivity extends BaseAcitvity {
 
@@ -97,7 +93,7 @@ public class EditBlogActivity extends BaseAcitvity {
                     Toast.makeText(EditBlogActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                InternetUtil internetUtil = new InternetUtil();
+                NetWorkUtil internetUtil = new NetWorkUtil();
                 String title = edTitle.getEditText().getText().toString();
                 String content = edContent.getEditText().getText().toString();
                 String imageType = "";

@@ -1,9 +1,7 @@
 package com.uncle.egg.blogclient.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,17 +12,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.target.Target;
 import com.uncle.egg.blogclient.R;
 import com.uncle.egg.blogclient.activity.DetailsActivity;
-import com.uncle.egg.blogclient.activity.HomeActivity;
-import com.uncle.egg.blogclient.activity.MainActivity;
-import com.uncle.egg.blogclient.bean.Blog;
 import com.uncle.egg.blogclient.bean.Results;
-import com.uncle.egg.blogclient.util.InternetUtil;
+import com.uncle.egg.blogclient.util.NetWorkUtil;
 
 import java.util.List;
 
@@ -56,13 +49,13 @@ public class RcvAdapterHomePage extends RecyclerView.Adapter<RcvAdapterHomePage.
 
     @Override
     public void onBindViewHolder(final RcvAdapterHomePage.ViewHolder holder, final int position) {
-        holder.tvAuthor.setText(listBlog.get(position).getTableUserByUserId().getUsername());
+        holder.tvAuthor.setText(listBlog.get(position).getUserEntity().getUsername());
         holder.tvTitle.setText(listBlog.get(position).getBlogTitle());
         holder.tvDate.setText(listBlog.get(position).getBlogDate());
 
         String urlPath = listBlog.get(position).getImgPath();
         //拼接出完整的图片地址
-        urlPath = InternetUtil.URL_BASE + urlPath;
+        urlPath = NetWorkUtil.URL_BASE + urlPath;
         Log.i(TAG, "onResourceReady: "+urlPath);
         //使用tag标记item，来防止图片错乱
         //获取tag

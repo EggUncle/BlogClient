@@ -1,16 +1,11 @@
 package com.uncle.egg.blogclient.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.uncle.egg.blogclient.R;
-import com.uncle.egg.blogclient.bean.Blog;
-import com.uncle.egg.blogclient.bean.BlogJson;
 import com.uncle.egg.blogclient.bean.Results;
-import com.uncle.egg.blogclient.util.InternetUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,22 +43,22 @@ public class TestActivity extends BaseAcitvity {
 //        btn1.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
-//                InternetUtil internetUtil=new InternetUtil();
-//                internetUtil.getBlog(testList,InternetUtil.GET_ONE,20);
+//                NetWorkUtil internetUtil=new NetWorkUtil();
+//                internetUtil.getBlog(testList,NetWorkUtil.GET_ONE,20);
 //            }
 //        });
 //        btn2.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
-//                InternetUtil internetUtil=new InternetUtil();
-//                internetUtil.getBlog(testList,InternetUtil.GET_MORE_MAX,20);
+//                NetWorkUtil internetUtil=new NetWorkUtil();
+//                internetUtil.getBlog(testList,NetWorkUtil.GET_MORE_MAX,20);
 //            }
 //        });
 //        btn3.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
-//                InternetUtil internetUtil=new InternetUtil();
-//                internetUtil.getBlog(testList,InternetUtil.GET_MORE_MIN,20);
+//                NetWorkUtil internetUtil=new NetWorkUtil();
+//                internetUtil.getBlog(testList,NetWorkUtil.GET_MORE_MIN,20);
 //            }
 //        });
     }

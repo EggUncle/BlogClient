@@ -1,5 +1,7 @@
 package com.uncle.egg.blogclient.bean;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 /**
@@ -16,7 +18,8 @@ public class Results implements Serializable {
 
     private String blogContent;
 
-    private TableUserByUserId tableUserByUserId;
+    @SerializedName("user")
+    private UserEntity userEntity;
 
     private String imgPath;
 
@@ -44,11 +47,11 @@ public class Results implements Serializable {
     public String getBlogContent(){
         return this.blogContent;
     }
-    public void setTableUserByUserId(TableUserByUserId tableUserByUserId){
-        this.tableUserByUserId = tableUserByUserId;
+    public void setUserEntity(UserEntity userEntity){
+        this.userEntity = userEntity;
     }
-    public TableUserByUserId getTableUserByUserId(){
-        return this.tableUserByUserId;
+    public UserEntity getUserEntity(){
+        return this.userEntity;
     }
     public void setImgPath(String imgPath){
         this.imgPath = imgPath;

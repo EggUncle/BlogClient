@@ -5,12 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.uncle.egg.blogclient.bean.LoginJson;
-import com.uncle.egg.blogclient.bean.TableUserByUserId;
+import com.uncle.egg.blogclient.bean.UserEntity;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by egguncle on 17-1-21.
@@ -41,7 +37,13 @@ public class SPUtil {
     }
 
     //保存用户信息
-    public static void saveUserInfo(TableUserByUserId userInfo) {
+    public static void saveUserInfo(UserEntity userInfo) {
+
+        Log.i(TAG, "saveUserInfo: " + userInfo.getUsername());
+        Log.i(TAG, "saveUserInfo: " + userInfo.getToken());
+        Log.i(TAG, "saveUserInfo: " + userInfo.getNickname());
+        Log.i(TAG, "saveUserInfo: " + userInfo.getBgPath());
+        Log.i(TAG, "saveUserInfo: " + userInfo.getIconPath());
 
         mEditor.putString("userName", userInfo.getUsername());
         mEditor.putString("userId", userInfo.getUserId() + "");
@@ -49,12 +51,13 @@ public class SPUtil {
         mEditor.putString("description", userInfo.getDescription());
         mEditor.putString("iconPath", userInfo.getIconPath());
         mEditor.putString("bgPath", userInfo.getBgPath());
-        mEditor.putString("userPassWd", userInfo.getUserPassWd());
+        mEditor.putString("token", userInfo.getToken());
 
         Log.i(TAG, "saveUserInfo: " + userInfo.getUsername() + "  " + userInfo.getUserId());
 
         mEditor.commit();
     }
+
 
     //获取用户ID
     public static String getUserId() {
@@ -70,6 +73,7 @@ public class SPUtil {
     public static String getIconPath() {
         return mSharedPreferences.getString("iconPath", "");
     }
+
 
     //获取用户背景图片路径
     public static String getBgPath() {
@@ -89,5 +93,21 @@ public class SPUtil {
     //获取用户名
     public String getUserName() {
         return mSharedPreferences.getString("userName", "");
+    }
+
+    //保存用户名
+    public static void setUserName(String userName) {
+        mEditor.putString("userName", userName);
+        mEditor.commit();
+    }
+
+    //获取用户token
+    public String getToken() {
+        return mSharedPreferences.getString("token", "");
+    }
+    //保存用户token
+    public void setToken(String token){
+        mEditor.putString("token", token);
+        mEditor.commit();
     }
 }

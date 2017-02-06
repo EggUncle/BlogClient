@@ -12,7 +12,7 @@ public class LoginJson implements Serializable{
     private boolean error;
 
     //结果
-    private TableUserByUserId userEntity;
+    private UserEntity userEntity;
 
     public boolean isError() {
         return error;
@@ -22,11 +22,11 @@ public class LoginJson implements Serializable{
         this.error = error;
     }
 
-    public TableUserByUserId getUserEntity() {
+    public UserEntity getUserEntity() {
         return userEntity;
     }
 
-    public void setUserEntity(TableUserByUserId userEntity) {
+    public void setUserEntity(UserEntity userEntity) {
         this.userEntity = userEntity;
     }
 }

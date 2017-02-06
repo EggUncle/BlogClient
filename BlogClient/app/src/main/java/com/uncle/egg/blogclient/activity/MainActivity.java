@@ -20,7 +20,7 @@ import android.view.View;
 import com.uncle.egg.blogclient.R;
 import com.uncle.egg.blogclient.adapter.RcvAdapterHomePage;
 import com.uncle.egg.blogclient.bean.Results;
-import com.uncle.egg.blogclient.util.InternetUtil;
+import com.uncle.egg.blogclient.util.NetWorkUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class MainActivity extends BaseAcitvity {
     private BlogJsonReceiver blogJsonReceiver;
     private LocalBroadcastManager localBroadcastManager;
     private IntentFilter intentFilter;
-    private InternetUtil internetUtil;
+    private NetWorkUtil internetUtil;
 
     private List<Results> listBlog;
     private RcvAdapterHomePage rcvAdapterHomePage;
@@ -85,7 +85,7 @@ public class MainActivity extends BaseAcitvity {
 //        rshHome.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 //            @Override
 //            public void onRefresh() {
-//                internetUtil.getBlog(listBlog,InternetUtil.GET_MORE_MAX,maxId);
+//                internetUtil.getBlog(listBlog,NetWorkUtil.GET_MORE_MAX,maxId);
 //            }
 //        });
 
@@ -100,7 +100,7 @@ public class MainActivity extends BaseAcitvity {
 
     private void initData() {
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        internetUtil = new InternetUtil(localBroadcastManager);
+        internetUtil = new NetWorkUtil(localBroadcastManager);
         intentFilter = new IntentFilter();
         intentFilter.addAction(BLOG_BROADCAST);
         blogJsonReceiver = new BlogJsonReceiver();
