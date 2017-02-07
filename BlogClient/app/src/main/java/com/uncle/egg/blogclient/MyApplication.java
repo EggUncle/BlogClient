@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Environment;
+import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -14,7 +15,10 @@ import com.netease.nimlib.sdk.StatusBarNotificationConfig;
 import com.netease.nimlib.sdk.auth.LoginInfo;
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.uinfo.UserInfoProvider;
+import com.uncle.egg.blogclient.activity.ChatActivity;
 import com.uncle.egg.blogclient.activity.MainActivity;
+import com.uncle.egg.blogclient.util.NetWorkUtil;
+import com.uncle.egg.blogclient.util.SPUtil;
 
 /**
  * Created by egguncle on 17-1-17.
@@ -28,9 +32,21 @@ public class MyApplication extends Application {
     //volley队列
     private static RequestQueue queue;
 
+    private final static String TAG = "MyApplication";
+
+    private static LoginInfo mLoginInfo;
 
     @Override
     public void onCreate() {
+        //登录初始化，若存在登录信息
+        SPUtil spUtil = SPUtil.getInstance(this);
+        if (spUtil.isLogin()) {
+            //在程序初始化时，如果检测到已经存储了登录信息，则进行登录操作
+            String userName = spUtil.getUserName();
+            String token = spUtil.getToken();
+            mLoginInfo = new LoginInfo(userName, token);
+        }
+
 
         // SDK初始化（启动后台服务，若已经存在用户登录信息， SDK 将完成自动登录）
         NIMClient.init(this, loginInfo(), options());
@@ -39,6 +55,8 @@ public class MyApplication extends Application {
         context = getApplicationContext();
         //请求队列初始化
         queue = Volley.newRequestQueue(context);
+
+
     }
 
     //获取全局context
@@ -47,7 +65,7 @@ public class MyApplication extends Application {
     }
 
     //获取volley队列
-    public static RequestQueue getQueue(){
+    public static RequestQueue getQueue() {
         return queue;
     }
 
@@ -57,7 +75,7 @@ public class MyApplication extends Application {
 
         // 如果将新消息通知提醒托管给 SDK 完成，需要添加以下配置。否则无需设置。
         StatusBarNotificationConfig config = new StatusBarNotificationConfig();
-        config.notificationEntrance = MainActivity.class; // 点击通知栏跳转到该Activity
+        config.notificationEntrance = ChatActivity.class; // 点击通知栏跳转到该Activity
         config.notificationSmallIconId = R.mipmap.ic_launcher;
         // 呼吸灯配置
         config.ledARGB = Color.GREEN;
@@ -113,7 +131,11 @@ public class MyApplication extends Application {
     }
 
     // 如果已经存在用户登录信息，返回LoginInfo，否则返回null即可
-    private LoginInfo loginInfo() {
-        return null;
+    public static LoginInfo loginInfo() {
+        return mLoginInfo;
+    }
+
+    public static void setLoginInfo(LoginInfo loginInfo) {
+        mLoginInfo = loginInfo;
     }
 }

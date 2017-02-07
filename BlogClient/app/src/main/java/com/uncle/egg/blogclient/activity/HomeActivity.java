@@ -232,8 +232,52 @@ public class HomeActivity extends AppCompatActivity
         rcvAdapterHomePage = new RcvAdapterHomePage(listBlog, this);
         rcvHome.setAdapter(rcvAdapterHomePage);
 
+        //这个步骤暂时放到onresume中执行
+//        //初始化侧划菜单部分
+//        //用户昵称和描述
+//        spUtil = SPUtil.getInstance(this);
+//        String nickName = spUtil.getNickName();
+//        String description = spUtil.getDescription();
+//        tvName.setText(nickName);
+//        tvDescription.setText(description);
+//
+//        //加载头像
+//        //获取图片地址（网络）
+//        String iconImgUrl = spUtil.getIconPath();
+//        if (!"".equals(iconImgUrl)) {
+//            Glide.with(HomeActivity.this)
+//                    .load(iconImgUrl)
+//                    .error(R.mipmap.ic_launcher)
+//                    //  .override(100, 100)
+//                    .fitCenter()
+//                    // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
+//                    .into(imgIcon);
+//        }
+//
+//        String bgImgUrl = spUtil.getBgPath();
+//        if (!"".equals(bgImgUrl)) {
+//            Glide.with(HomeActivity.this)
+//                    .load(bgImgUrl)
+//                    //  .override(100, 100)
+//                    .centerCrop()
+//                    // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
+//                    .into(imgBg);
+//        }
 
-        //初始化侧划菜单部分
+
+    }
+
+//    @Override
+//    public int getLayoutId() {
+//        return R.layout.activity_home;
+//    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //初始化侧划菜单部分 处理注册后回到该页面的情况，后期回优化这个步骤
         //用户昵称和描述
         spUtil = SPUtil.getInstance(this);
         String nickName = spUtil.getNickName();
@@ -258,20 +302,13 @@ public class HomeActivity extends AppCompatActivity
         if (!"".equals(bgImgUrl)) {
             Glide.with(HomeActivity.this)
                     .load(bgImgUrl)
+                    .error(R.drawable.bg)
                     //  .override(100, 100)
                     .centerCrop()
                     // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
                     .into(imgBg);
         }
-
-
     }
-
-//    @Override
-//    public int getLayoutId() {
-//        return R.layout.activity_home;
-//    }
-
 
     @Override
     public void onBackPressed() {

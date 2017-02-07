@@ -88,7 +88,7 @@ public class EditBlogActivity extends BaseAcitvity {
                 //从sp中取出用户名，若为默认值，则说明没有登录
                 SPUtil sp = SPUtil.getInstance(EditBlogActivity.this);
                 String userName = sp.getUserName();
-                String userPassWd=sp.getUserPassWd();
+                String token=sp.getToken();
                 if ("".equals(userName)){
                     Toast.makeText(EditBlogActivity.this, "请先登录", Toast.LENGTH_SHORT).show();
                     return;
@@ -103,7 +103,7 @@ public class EditBlogActivity extends BaseAcitvity {
                     Log.i(TAG, "onClick: " + imageType);
 
                 }
-                internetUtil.submitBlog(userName,userPassWd, title, content, imagePath, imageType);
+                internetUtil.submitBlog(userName,token, title, content, imagePath, imageType);
             }
         });
 

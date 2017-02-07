@@ -58,6 +58,17 @@ public class SPUtil {
         mEditor.commit();
     }
 
+    //登录状态
+    public static Boolean isLogin(){
+        return mSharedPreferences.getBoolean("login",false);
+    }
+
+    //登录
+    public static void spLogin(){
+        mEditor.putBoolean("login", true);
+        mEditor.commit();
+    }
+
 
     //获取用户ID
     public static String getUserId() {

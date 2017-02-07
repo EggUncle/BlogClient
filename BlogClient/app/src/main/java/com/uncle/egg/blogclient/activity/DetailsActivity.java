@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -62,6 +63,7 @@ public class DetailsActivity extends BaseAcitvity {
         super.onCreate(savedInstanceState);
         initView();
         initData();
+        initAction();
     }
 
     @Override
@@ -89,16 +91,17 @@ public class DetailsActivity extends BaseAcitvity {
         tvDetailsContent.setText(mBlog.getBlogContent());
         //加载头像
         //获取图片地址（网络）
-        String iconImgUrl = NetWorkUtil.URL_BASE+ mBlog.getUserEntity().getIconPath();
+        String iconImgUrl = NetWorkUtil.URL_BASE + mBlog.getUserEntity().getIconPath();
         if (!"".equals(iconImgUrl)) {
             Glide.with(this)
                     .load(iconImgUrl)
                     //  .override(100, 100)
+                    .error(R.mipmap.ic_launcher)
                     .fitCenter()
                     // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
                     .into(ivUserIcon);
         }
-        String bgImgUrl = NetWorkUtil.URL_BASE+mBlog.getImgPath();
+        String bgImgUrl = NetWorkUtil.URL_BASE + mBlog.getImgPath();
         if (!"".equals(bgImgUrl)) {
             Glide.with(this)
                     .load(bgImgUrl)
@@ -113,6 +116,20 @@ public class DetailsActivity extends BaseAcitvity {
         internetUtil = new NetWorkUtil();
 
         spUtil = SPUtil.getInstance(this);
+    }
+
+    private void initAction() {
+        //点击用户头像，跳转到对应聊天页面
+        ivUserIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //获取博客作者用户名，传递到下一个界面
+                String name = mBlog.getUserEntity().getUsername();
+                Intent intent=new Intent(DetailsActivity.this,ChatActivity.class);
+                intent.putExtra("name",name);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

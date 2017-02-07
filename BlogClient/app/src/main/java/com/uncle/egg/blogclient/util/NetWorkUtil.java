@@ -412,6 +412,9 @@ public class NetWorkUtil {
                     //进行网易云信的登录
                     doLoginWithIM(user.getUsername(),user.getToken());
 
+                    //在sharePreferences中保存登录状态信息
+                    SPUtil.spLogin();
+
                     Intent intent = new Intent(LoginActivity.LOGIN_BROADCAST);
                     //将loginjson对象序列化存入bundle
                     Bundle bundle = new Bundle();
@@ -455,6 +458,7 @@ public class NetWorkUtil {
      * @param token
      */
     public static void doLoginWithIM(String userName, String token) {
+        Log.i(TAG, "doLoginWithIM: ");
         LoginInfo info = new LoginInfo(userName, token); // config...
         RequestCallback<LoginInfo> callback =
                 new RequestCallback<LoginInfo>() {
@@ -467,6 +471,8 @@ public class NetWorkUtil {
                         SPUtil spUtil = SPUtil.getInstance(MyApplication.getMyContext());
                         spUtil.setUserName(userName);
                         spUtil.setToken(token);
+
+
 //                        Intent intent=new Intent(LoginActivity.this,MainActivity.class);
 //                        startActivity(intent);
                     }
@@ -478,7 +484,7 @@ public class NetWorkUtil {
 
                     @Override
                     public void onException(Throwable throwable) {
-
+                        Log.i(TAG, "onException: failed ,error!!! ");
                     }
                     // 可以在此保存LoginInfo到本地，下次启动APP做自动登录用
                 };
@@ -491,13 +497,13 @@ public class NetWorkUtil {
      * 提交博客的方法
      *
      * @param userName
-     * @param userPassWd
+     * @param token
      * @param title
      * @param content
      * @param imagePath
      * @param imageType
      */
-    public void submitBlog(final String userName,final String userPassWd, final String title, final String content, final String imagePath, final String imageType) {
+    public void submitBlog(final String userName,final String token, final String title, final String content, final String imagePath, final String imageType) {
         StringRequest submitRequest = new StringRequest(Request.Method.POST, URL_SUMBIT_BLOG, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -517,7 +523,7 @@ public class NetWorkUtil {
                 params.put("title", title);
                 params.put("content", content);
                 params.put("userName",userName);
-                params.put("userPassWd",userPassWd);
+                params.put("token",token);
                 String base64StrOfImg = "";
 //
                 if (!"".equals(imagePath)) {
