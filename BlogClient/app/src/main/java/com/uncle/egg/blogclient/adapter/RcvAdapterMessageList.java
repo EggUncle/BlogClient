@@ -1,6 +1,7 @@
 package com.uncle.egg.blogclient.adapter;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import com.netease.nimlib.sdk.msg.model.IMMessage;
 import com.uncle.egg.blogclient.R;
 import com.uncle.egg.blogclient.activity.ChatActivity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,62 +42,42 @@ public class RcvAdapterMessageList extends RecyclerView.Adapter<RcvAdapterMessag
         accountList = new ArrayList<>();
         messageMap = new HashMap<>();
 
-        //若消息列表不为空，则将里面的用户名信息加入
-        if (mImMessageList != null) {
-            for (IMMessage m : mImMessageList) {
-                //获取消息列表item的用户名
-                String account = m.getFromAccount();
-                //根据用户名获取对应用户的消息列表
-                List<IMMessage> messageList = messageMap.get("account");
-                if (messageList == null) {
-                    //如果消息列表为空，则新建列表
-                    messageList = new ArrayList<>();
-                    //将该条信息加入对应用户列表中
-                    messageList.add(m);
-                    //将用户名和信息列表的对应信息存入map中
-                    if (!accountList.contains(account)) {
-                        accountList.add(account);
-                        messageMap.put(account, messageList);
-                    }else{
-                        messageMap.get(account).addAll(messageList);
-                    }
-                }
-
-            }
-        }
+        addData(imMessageList);
     }
 
     /**
      * 给最近消息界面添加数据
+     *
      * @param list
      */
-    public void addData(List<IMMessage> list){
+    public void addData(List<IMMessage> list) {
         //若消息列表不为空，则将里面的用户名信息加入
         if (list != null) {
             for (IMMessage m : list) {
                 //获取消息列表item的用户名
                 String account = m.getFromAccount();
                 //根据用户名获取对应用户的消息列表
-                List<IMMessage> messageList = messageMap.get("account");
+                List<IMMessage> messageList = messageMap.get(account);
                 if (messageList == null) {
                     //如果消息列表为空，则新建列表
                     messageList = new ArrayList<>();
                     //将该条信息加入对应用户列表中
                     messageList.add(m);
                     //将用户名和信息列表的对应信息存入map中
-                    if (!accountList.contains(account)) {
-                        accountList.add(account);
-                        messageMap.put(account, messageList);
-                    }else{
-                        messageMap.get(account).addAll(messageList);
+                    accountList.add(account);
+                    messageMap.put(account, messageList);
+                    for (IMMessage i:messageList){
+                        Log.i(TAG, "addData: 添加用户和数据"+i.getContent());
                     }
+                } else {
+                    messageList.add(m);
                 }
 
             }
         }
 
-      //  notifyItemRangeChanged(0,accountList.size());
-        notifyDataSetChanged();
+        notifyItemRangeChanged(0,accountList.size());
+        //notifyDataSetChanged();
     }
 
     @Override
@@ -111,20 +93,32 @@ public class RcvAdapterMessageList extends RecyclerView.Adapter<RcvAdapterMessag
         Log.i(TAG, "onBindViewHolder: ");
 
         //获取对应位置的用户名
-        String account =accountList.get(position);
+        final String account = accountList.get(position);
         //获取该用户名的消息集合
-        List<IMMessage> list=messageMap.get(account);
+        List<IMMessage> list = messageMap.get(account);
+        for (IMMessage m:list){
+            Log.i(TAG, "onBindViewHolder: "+m.getContent());
+        }
 
         holder.tvUserName.setText(account);
         holder.tvUserMessage.setText(list.get(list.size()-1).getContent());
         holder.ivIcon.setImageResource(R.mipmap.ic_launcher);
+        holder.tvNotify.setText(list.size()+"");
 
         //点击列表项，打开对应用户聊天界面
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), ChatActivity.class);
-                intent.putExtra("name", mImMessageList.get(position).getFromAccount());
+                Bundle bundle=new Bundle();
+                List<IMMessage> messages= messageMap.get(account);
+
+                for (IMMessage m:messages
+                     ) {
+                    Log.i(TAG, "onClick: "+m.getContent());
+                }
+                bundle.putSerializable("list", (Serializable) messages);
+                intent.putExtra("messageBundle", bundle);
                 view.getContext().startActivity(intent);
             }
         });
@@ -145,13 +139,15 @@ public class RcvAdapterMessageList extends RecyclerView.Adapter<RcvAdapterMessag
         private CircleImageView ivIcon;
         private TextView tvUserName;
         private TextView tvUserMessage;
+        //未读计数
+        private TextView tvNotify;
 
         public ViewHolder(View itemView) {
             super(itemView);
-
             ivIcon = (CircleImageView) itemView.findViewById(R.id.iv_icon);
             tvUserName = (TextView) itemView.findViewById(R.id.tv_user_name);
             tvUserMessage = (TextView) itemView.findViewById(R.id.tv_user_message);
+            tvNotify = (TextView) itemView.findViewById(R.id.tv_notify);
 
         }
     }

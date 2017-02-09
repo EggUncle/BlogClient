@@ -51,9 +51,9 @@ public class MessageActivity extends BaseAcitvity {
     }
 
     private void initData() {
+
         ArrayList<IMMessage> messagesList = (ArrayList<IMMessage>)
                 getIntent().getSerializableExtra(NimIntent.EXTRA_NOTIFY_CONTENT); // 可以获取消息的发送者，跳转到指定的单聊、群聊界面。
-
         for (IMMessage m : messagesList) {
             Log.i(TAG, "initData: " + m.getContent());
         }

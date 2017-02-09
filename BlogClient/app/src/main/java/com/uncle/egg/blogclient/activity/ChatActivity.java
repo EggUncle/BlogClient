@@ -83,17 +83,31 @@ public class ChatActivity extends BaseAcitvity {
 
     private void initData() {
         //如果是点击博客中的作者头像进入聊天页面
+//        name = getIntent().getStringExtra("name");
+//        String content = "";
+//        if (name == null) {
+//            //如果是从通知栏的推送进入博客页面
+//            ArrayList<IMMessage> messages = (ArrayList<IMMessage>)
+//                    getIntent().getSerializableExtra(NimIntent.EXTRA_NOTIFY_CONTENT); // 可以获取消息的发送者，跳转到指定的单聊、群聊界面。
+//            name = messages.get(0).getFromAccount();
+//            content = messages.get(0).getContent();
+//            tvMessage.append(content + "\n");
+//        }
+      //  如果是点击博客中的作者头像进入聊天页面
         name = getIntent().getStringExtra("name");
         String content = "";
+        //如果是通过消息列表进入的界面
         if (name == null) {
-            //如果是从通知栏的推送进入博客页面
-            ArrayList<IMMessage> messages = (ArrayList<IMMessage>)
-                    getIntent().getSerializableExtra(NimIntent.EXTRA_NOTIFY_CONTENT); // 可以获取消息的发送者，跳转到指定的单聊、群聊界面。
-            name = messages.get(0).getFromAccount();
-            content = messages.get(0).getContent();
-            tvMessage.append(content + "\n");
-        }
+            Bundle bundle = getIntent().getBundleExtra("messageBundle");
+            List<IMMessage> messages = (List<IMMessage>) bundle.getSerializable("list");
 
+            for (IMMessage m : messages) {
+                tvMessage.append(m.getContent() + "\n");
+            }
+
+            name = messages.get(0).getFromAccount();
+     //       content = messages.get(0).getContent();
+        }
         Log.i(TAG, "initData: " + name);
 
 
@@ -127,6 +141,6 @@ public class ChatActivity extends BaseAcitvity {
     protected void onResume() {
         super.onResume();
         // 进入聊天界面，建议放在onResume中
-        NIMClient.getService(MsgService.class).setChattingAccount(name,SessionTypeEnum.P2P);
+        NIMClient.getService(MsgService.class).setChattingAccount(name, SessionTypeEnum.P2P);
     }
 }
