@@ -122,4 +122,11 @@ public class ChatActivity extends BaseAcitvity {
         edMessage = (EditText) findViewById(R.id.ed_message);
         btnSend = (Button) findViewById(R.id.btn_send);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 进入聊天界面，建议放在onResume中
+        NIMClient.getService(MsgService.class).setChattingAccount(name,SessionTypeEnum.P2P);
+    }
 }

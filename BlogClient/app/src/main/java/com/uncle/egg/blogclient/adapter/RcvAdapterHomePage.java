@@ -47,6 +47,11 @@ public class RcvAdapterHomePage extends RecyclerView.Adapter<RcvAdapterHomePage.
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_home, parent, false));
     }
 
+    public void add(List<Results> list){
+        listBlog.addAll(list);
+        notifyItemInserted(listBlog.size());
+    }
+
     @Override
     public void onBindViewHolder(final RcvAdapterHomePage.ViewHolder holder, final int position) {
         holder.tvAuthor.setText(listBlog.get(position).getUserEntity().getUsername());
