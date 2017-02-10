@@ -10,11 +10,15 @@ import android.util.Log;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.NimIntent;
 import com.netease.nimlib.sdk.Observer;
+import com.netease.nimlib.sdk.RequestCallbackWrapper;
 import com.netease.nimlib.sdk.msg.MsgService;
 import com.netease.nimlib.sdk.msg.MsgServiceObserve;
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
+import com.netease.nimlib.sdk.msg.model.RecentContact;
+import com.uncle.egg.blogclient.MyApplication;
 import com.uncle.egg.blogclient.R;
+import com.uncle.egg.blogclient.Service.MessageService;
 import com.uncle.egg.blogclient.adapter.RcvAdapterMessageList;
 
 import java.io.Serializable;
@@ -51,16 +55,14 @@ public class MessageActivity extends BaseAcitvity {
     }
 
     private void initData() {
-
-        ArrayList<IMMessage> messagesList = (ArrayList<IMMessage>)
-                getIntent().getSerializableExtra(NimIntent.EXTRA_NOTIFY_CONTENT); // 可以获取消息的发送者，跳转到指定的单聊、群聊界面。
+        // 可以获取消息的发送者，跳转到指定的单聊、群聊界面。 这个东西只能用来返回消息发送者和其发送的最新的一条信息
+//        ArrayList<IMMessage> messagesList = (ArrayList<IMMessage>)
+//                getIntent().getSerializableExtra(NimIntent.EXTRA_NOTIFY_CONTENT);
+        List<IMMessage> messagesList= MessageService.getMessages();
         for (IMMessage m : messagesList) {
             Log.i(TAG, "initData: " + m.getContent());
         }
 
-//       name = messages.get(0).getFromAccount();
-//        content = messages.get(0).getContent();
-//        tvMessage.append(content + "\n");
         rcvAdapterMessageList = new RcvAdapterMessageList(messagesList);
 
         //消息处理

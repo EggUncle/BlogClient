@@ -2,6 +2,7 @@ package com.uncle.egg.blogclient;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Environment;
@@ -10,16 +11,23 @@ import android.util.Log;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.netease.nimlib.sdk.NIMClient;
+import com.netease.nimlib.sdk.Observer;
 import com.netease.nimlib.sdk.SDKOptions;
 import com.netease.nimlib.sdk.StatusBarNotificationConfig;
 import com.netease.nimlib.sdk.auth.LoginInfo;
+import com.netease.nimlib.sdk.msg.MsgServiceObserve;
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
+import com.netease.nimlib.sdk.msg.model.IMMessage;
 import com.netease.nimlib.sdk.uinfo.UserInfoProvider;
+import com.uncle.egg.blogclient.Service.MessageService;
 import com.uncle.egg.blogclient.activity.ChatActivity;
 import com.uncle.egg.blogclient.activity.MainActivity;
 import com.uncle.egg.blogclient.activity.MessageActivity;
 import com.uncle.egg.blogclient.util.NetWorkUtil;
 import com.uncle.egg.blogclient.util.SPUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by egguncle on 17-1-17.
@@ -36,6 +44,7 @@ public class MyApplication extends Application {
     private final static String TAG = "MyApplication";
 
     private static LoginInfo mLoginInfo;
+
 
     @Override
     public void onCreate() {
@@ -58,7 +67,11 @@ public class MyApplication extends Application {
         queue = Volley.newRequestQueue(context);
 
 
+        //启动自定义的消息接收服务
+        Intent intent = new Intent(this, MessageService.class);
+        startService(intent);
     }
+
 
     //获取全局context
     public static Context getMyContext() {
@@ -128,6 +141,8 @@ public class MyApplication extends Application {
                 return null;
             }
         };
+
+
         return options;
     }
 

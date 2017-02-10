@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.uncle.egg.blogclient.R;
+import com.uncle.egg.blogclient.Service.MessageService;
 import com.uncle.egg.blogclient.adapter.RcvAdapterHomePage;
 import com.uncle.egg.blogclient.bean.Results;
 import com.uncle.egg.blogclient.util.NetWorkUtil;
@@ -100,6 +101,8 @@ public class HomeActivity extends AppCompatActivity
         initView();
         initAction();
         initData();
+
+
     }
 
     private void initView() {
