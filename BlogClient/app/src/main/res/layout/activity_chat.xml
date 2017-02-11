@@ -5,20 +5,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-
     tools:context="com.uncle.egg.blogclient.activity.ChatActivity">
 
-    <ScrollView
-        android:background="@color/bg_chat"
+    <!--<ScrollView-->
+        <!--android:background="@color/bg_chat"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_weight="1">-->
+
+        <!--&lt;!&ndash;<TextView&ndash;&gt;-->
+            <!--&lt;!&ndash;android:id="@+id/tv_message"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_height="wrap_content" />&ndash;&gt;-->
+        <!---->
+        <!---->
+    <!--</ScrollView>-->
+
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <TextView
-            android:id="@+id/tv_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </ScrollView>
+        android:layout_weight="1"
+        android:background="@color/bg_chat"
+        android:id="@+id/rcv_chat"
+        />
 
     <LinearLayout
         android:background="@color/bg_chat"
@@ -31,7 +40,6 @@
 
         <EditText
             android:paddingLeft="@dimen/space_s"
-            android:layout_marginLeft="@dimen/space_s"
             android:id="@+id/ed_message"
             android:layout_width="match_parent"
             android:layout_height="@dimen/btn_send_height"

@@ -4,11 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.netease.nimlib.sdk.NIMClient;
@@ -21,15 +25,21 @@ import com.netease.nimlib.sdk.msg.MsgServiceObserve;
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
 import com.uncle.egg.blogclient.R;
+import com.uncle.egg.blogclient.adapter.RcvAdapterChat;
 import com.uncle.egg.blogclient.bean.UserEntity;
+import com.uncle.egg.blogclient.util.SPUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChatActivity extends BaseAcitvity {
-    private TextView tvMessage;
+    private LinearLayout activityChat;
+    private RecyclerView rcvChat;
     private EditText edMessage;
     private Button btnSend;
+
+    private RcvAdapterChat rcvAdapterChat;
+    private List<IMMessage> imMessageList;
 
     private final static String TAG = "ChatActivity";
 
@@ -70,7 +80,7 @@ public class ChatActivity extends BaseAcitvity {
                 //获取输入的信息
                 String content = edMessage.getText().toString();
                 // 创建文本消息
-                IMMessage message = MessageBuilder.createTextMessage(
+                final IMMessage message = MessageBuilder.createTextMessage(
                         name, // 聊天对象的 ID，如果是单聊，为用户帐号，如果是群聊，为群组 ID
                         SessionTypeEnum.P2P, // 聊天类型，单聊或群组
                         content // 文本内容
@@ -81,6 +91,7 @@ public class ChatActivity extends BaseAcitvity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.i(TAG, "onSuccess: ");
+                        rcvAdapterChat.addData(message);
                     }
 
                     @Override
@@ -95,7 +106,7 @@ public class ChatActivity extends BaseAcitvity {
                 });
 
                 //将信息加入textview中
-                tvMessage.append("我:  " + content + "\n");
+                // tvMessage.append("我:  " + content + "\n");
 
                 //清空输入框
                 edMessage.setText("");
@@ -105,6 +116,12 @@ public class ChatActivity extends BaseAcitvity {
     }
 
     private void initData() {
+        imMessageList=new ArrayList<>();
+        SPUtil spUtil = SPUtil.getInstance(this);
+        String userName = spUtil.getUserName();
+        rcvAdapterChat = new RcvAdapterChat(imMessageList, userName);
+        rcvChat.setAdapter(rcvAdapterChat);
+
         //如果是点击博客中的作者头像进入聊天页面
         userEntity = (UserEntity) getIntent().getSerializableExtra("user");
         String content = "";
@@ -112,20 +129,16 @@ public class ChatActivity extends BaseAcitvity {
         if (userEntity == null) {
             Bundle bundle = getIntent().getBundleExtra("messageBundle");
             List<IMMessage> messages = (List<IMMessage>) bundle.getSerializable("list");
-
-            for (IMMessage m : messages) {
-                tvMessage.append(m.getContent() + "\n");
-            }
-
+            rcvAdapterChat.addData(messages);
             name = messages.get(0).getFromAccount();
-     //       content = messages.get(0).getContent();
-        }else{
-            name=userEntity.getUsername();
+            //       content = messages.get(0).getContent();
+        } else {
+            name = userEntity.getUsername();
         }
         Log.i(TAG, "initData: " + name);
 
         //给标题栏设置信息
-        Toolbar toolbar=getToolbar();
+        Toolbar toolbar = getToolbar();
         toolbar.setTitle(name);
 
         //消息处理
@@ -134,8 +147,8 @@ public class ChatActivity extends BaseAcitvity {
                     @Override
                     public void onEvent(List<IMMessage> messages) {
                         // 处理新收到的消息，为了上传处理方便，SDK 保证参数 messages 全部来自同一个聊天对象。
-
-                        tvMessage.append(messages.get(0).getContent() + "\n");
+                        rcvAdapterChat.addData(messages);
+                        //  tvMessage.append(messages.get(0).getContent() + "\n");
                     }
                 };
         NIMClient.getService(MsgServiceObserve.class)
@@ -149,9 +162,13 @@ public class ChatActivity extends BaseAcitvity {
     }
 
     private void initView() {
-        tvMessage = (TextView) findViewById(R.id.tv_message);
+        activityChat = (LinearLayout) findViewById(R.id.activity_chat);
+        rcvChat = (RecyclerView) findViewById(R.id.rcv_chat);
+        rcvChat.setLayoutManager(new LinearLayoutManager(this));
+        rcvChat.setItemAnimator(new DefaultItemAnimator());
         edMessage = (EditText) findViewById(R.id.ed_message);
         btnSend = (Button) findViewById(R.id.btn_send);
+
     }
 
     @Override
