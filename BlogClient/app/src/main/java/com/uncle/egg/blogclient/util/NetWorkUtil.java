@@ -4,6 +4,7 @@ package com.uncle.egg.blogclient.util;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Base64;
@@ -507,7 +508,6 @@ public class NetWorkUtil {
         StringRequest submitRequest = new StringRequest(Request.Method.POST, URL_SUMBIT_BLOG, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-
                 Log.i(TAG, "onResponse: " + response);
             }
         }, new Response.ErrorListener() {
@@ -551,9 +551,17 @@ public class NetWorkUtil {
     public String getImageStr(String imagePath) {//将图片文件转化为字节数组字符串，并对其进行Base64编码处理
         //decode to bitmap
         Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+
+        //裁剪图片，降低文件大小
+        int bitmapWidth = bitmap.getWidth();
+        int bitmapHeight = bitmap.getHeight();
+        Matrix matrix = new Matrix();
+        matrix.postScale(0.5f, 0.5f);
+        Bitmap scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, false);
+
         //convert to byte array
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] bytes = baos.toByteArray();
 
         //base64 encode
@@ -604,9 +612,9 @@ public class NetWorkUtil {
      * 删除博客的方法，需要在登录状态下使用，需要验证用户名和密码
      * @param blogId 需要删除的博客ID
      * @param userName 当前用户的用户名
-     * @param userPassWd 当前用户的密码
+     * @param token    
      */
-    public void deleteBlog(final int blogId, final String userName, final String userPassWd){
+    public void deleteBlog(final int blogId, final String userName, final String token){
         StringRequest deleteRequest=new StringRequest(Request.Method.POST, URL_DELETE_BLOG, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -623,7 +631,7 @@ public class NetWorkUtil {
                 Map<String,String> params=new HashMap<>();
                 params.put("blogId",blogId+"");
                 params.put("userName",userName);
-                params.put("userPassWd",userPassWd);
+                params.put("token",token);
                 return params;
             }
         };

@@ -1,5 +1,7 @@
 package com.uncle.egg.blogclient.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,6 +22,7 @@ import com.uncle.egg.blogclient.MyApplication;
 import com.uncle.egg.blogclient.R;
 import com.uncle.egg.blogclient.Service.MessageService;
 import com.uncle.egg.blogclient.adapter.RcvAdapterMessageList;
+import com.uncle.egg.blogclient.bean.UserEntity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,6 +36,7 @@ public class MessageActivity extends BaseAcitvity {
     private RecyclerView rcvMessages;
     private LinearLayoutManager linearLayoutManager;
     private RcvAdapterMessageList rcvAdapterMessageList;
+
 
 
     @Override

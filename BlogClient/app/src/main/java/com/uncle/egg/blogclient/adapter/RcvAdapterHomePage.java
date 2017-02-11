@@ -15,7 +15,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.uncle.egg.blogclient.R;
-import com.uncle.egg.blogclient.activity.DetailsActivity;
+import com.uncle.egg.blogclient.activity.BlogDetailActivity;
+import com.uncle.egg.blogclient.activity.UserDetailActivity;
 import com.uncle.egg.blogclient.bean.Results;
 import com.uncle.egg.blogclient.util.NetWorkUtil;
 
@@ -89,7 +90,8 @@ public class RcvAdapterHomePage extends RecyclerView.Adapter<RcvAdapterHomePage.
             @Override
             public void onClick(View view) {
                 //使用DetailsActivity专用的方法来启动activity
-                DetailsActivity.startAction(view.getContext(), listBlog.get(position));
+                BlogDetailActivity.startActivity(view.getContext(), listBlog.get(position));
+
             }
         });
 

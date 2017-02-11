@@ -1,7 +1,10 @@
 package com.uncle.egg.blogclient.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +21,7 @@ import com.netease.nimlib.sdk.msg.MsgServiceObserve;
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
 import com.uncle.egg.blogclient.R;
+import com.uncle.egg.blogclient.bean.UserEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +35,25 @@ public class ChatActivity extends BaseAcitvity {
 
     //聊天对象的用户名
     private String name;
+
+    //对应聊天的用户
+    private UserEntity userEntity;
+
+    /**
+     * 用于启动该activity的方法
+     *
+     * @param context
+     * @param user
+     */
+    public static void startActivity(Context context, UserEntity user) {
+        Intent intent = new Intent(context, ChatActivity.class);
+        //用bundle包装博客对象
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("user", user);
+        intent.putExtras(bundle);
+        //启动activty
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,21 +106,10 @@ public class ChatActivity extends BaseAcitvity {
 
     private void initData() {
         //如果是点击博客中的作者头像进入聊天页面
-//        name = getIntent().getStringExtra("name");
-//        String content = "";
-//        if (name == null) {
-//            //如果是从通知栏的推送进入博客页面
-//            ArrayList<IMMessage> messages = (ArrayList<IMMessage>)
-//                    getIntent().getSerializableExtra(NimIntent.EXTRA_NOTIFY_CONTENT); // 可以获取消息的发送者，跳转到指定的单聊、群聊界面。
-//            name = messages.get(0).getFromAccount();
-//            content = messages.get(0).getContent();
-//            tvMessage.append(content + "\n");
-//        }
-      //  如果是点击博客中的作者头像进入聊天页面
-        name = getIntent().getStringExtra("name");
+        userEntity = (UserEntity) getIntent().getSerializableExtra("user");
         String content = "";
         //如果是通过消息列表进入的界面
-        if (name == null) {
+        if (userEntity == null) {
             Bundle bundle = getIntent().getBundleExtra("messageBundle");
             List<IMMessage> messages = (List<IMMessage>) bundle.getSerializable("list");
 
@@ -107,9 +119,14 @@ public class ChatActivity extends BaseAcitvity {
 
             name = messages.get(0).getFromAccount();
      //       content = messages.get(0).getContent();
+        }else{
+            name=userEntity.getUsername();
         }
         Log.i(TAG, "initData: " + name);
 
+        //给标题栏设置信息
+        Toolbar toolbar=getToolbar();
+        toolbar.setTitle(name);
 
         //消息处理
         Observer<List<IMMessage>> incomingMessageObserver =

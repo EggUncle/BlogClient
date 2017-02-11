@@ -5,38 +5,48 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+
     tools:context="com.uncle.egg.blogclient.activity.ChatActivity">
 
     <ScrollView
-        android:layout_weight="1"
+        android:background="@color/bg_chat"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
         <TextView
             android:id="@+id/tv_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </ScrollView>
+
     <LinearLayout
+        android:background="@color/bg_chat"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/bottom_height"
         android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingLeft="@dimen/space_s"
         >
+
         <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/space_s"
+            android:layout_marginLeft="@dimen/space_s"
             android:id="@+id/ed_message"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/btn_send_height"
             android:layout_weight="1"
-            />
+            android:background="@drawable/bg_edit" />
+
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/space_s"
+            android:layout_marginLeft="@dimen/space_s"
             android:id="@+id/btn_send"
-            android:text="发送"
+            android:layout_width="@dimen/btn_send_width"
+            android:layout_height="@dimen/btn_send_height"
+            android:background="@drawable/bg_btn"
+            android:text="@string/send"
+            android:textColor="@android:color/white"
             />
     </LinearLayout>
 

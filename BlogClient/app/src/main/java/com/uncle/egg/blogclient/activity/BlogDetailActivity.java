@@ -4,6 +4,8 @@ package com.uncle.egg.blogclient.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,25 +16,26 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.uncle.egg.blogclient.R;
 import com.uncle.egg.blogclient.bean.Results;
+import com.uncle.egg.blogclient.bean.UserEntity;
 import com.uncle.egg.blogclient.util.NetWorkUtil;
 import com.uncle.egg.blogclient.util.SPUtil;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 
 /**
  * 显示博客详情页面
  */
-public class DetailsActivity extends BaseAcitvity {
+public class BlogDetailActivity extends BaseAcitvity {
 
-    private final static String TAG = "DetailsActivity";
+    private final static String TAG = "BlogDetailActivity";
 
     private LinearLayout activityDetails;
     private TextView tvDetailsTitle;
-    private TextView tvDetailsContent;
-    private TextView tvDetailsUser;
     private CircleImageView ivUserIcon;
-    private ImageView ivBlogImg;
-
+    private TextView tvDetailsUser;
+    private TextView tvDetailsDate;
+    private TextView tvDetailsContent;
 
     //上一个activity传入的blog对象
     private Results mBlog;
@@ -47,8 +50,8 @@ public class DetailsActivity extends BaseAcitvity {
      * @param context
      * @param blog    博客对象
      */
-    public static void startAction(Context context, Results blog) {
-        Intent intent = new Intent(context, DetailsActivity.class);
+    public static void startActivity(Context context, Results blog) {
+        Intent intent = new Intent(context, BlogDetailActivity.class);
         //用bundle包装博客对象
         Bundle bundle = new Bundle();
         bundle.putSerializable("blog", blog);
@@ -64,21 +67,31 @@ public class DetailsActivity extends BaseAcitvity {
         initView();
         initData();
         initAction();
+
+        Toolbar toolbar=getToolbar();
+        toolbar.setTitle(mBlog.getBlogTitle());
+     //   toolbar.setNavigationIcon(R.drawable.icon_back);
+//        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                finish();
+//            }
+//        });
     }
 
     @Override
     public int getLayoutId() {
-        return R.layout.activity_details;
+        return R.layout.activity_blog_details;
     }
 
 
     private void initView() {
         activityDetails = (LinearLayout) findViewById(R.id.activity_details);
         tvDetailsTitle = (TextView) findViewById(R.id.tv_details_title);
-        tvDetailsContent = (TextView) findViewById(R.id.tv_details_content);
-        tvDetailsUser = (TextView) findViewById(R.id.tv_details_user);
         ivUserIcon = (CircleImageView) findViewById(R.id.iv_user_icon);
-        ivBlogImg = (ImageView) findViewById(R.id.iv_blog_img);
+        tvDetailsUser = (TextView) findViewById(R.id.tv_details_user);
+        tvDetailsDate = (TextView) findViewById(R.id.tv_details_date);
+        tvDetailsContent = (TextView) findViewById(R.id.tv_details_content);
     }
 
     private void initData() {
@@ -88,6 +101,7 @@ public class DetailsActivity extends BaseAcitvity {
         //给界面设置数据
         tvDetailsTitle.setText(mBlog.getBlogTitle());
         tvDetailsUser.setText(mBlog.getUserEntity().getUsername());
+        tvDetailsDate.setText(mBlog.getBlogDate());
         tvDetailsContent.setText(mBlog.getBlogContent());
         //加载头像
         //获取图片地址（网络）
@@ -101,15 +115,6 @@ public class DetailsActivity extends BaseAcitvity {
                     // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
                     .into(ivUserIcon);
         }
-        String bgImgUrl = NetWorkUtil.URL_BASE + mBlog.getImgPath();
-        if (!"".equals(bgImgUrl)) {
-            Glide.with(this)
-                    .load(bgImgUrl)
-                    //  .override(100, 100)
-                    .fitCenter()
-                    // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
-                    .into(ivBlogImg);
-        }
 
 
         //网络请求工具类
@@ -119,15 +124,16 @@ public class DetailsActivity extends BaseAcitvity {
     }
 
     private void initAction() {
-        //点击用户头像，跳转到对应聊天页面
+        //点击用户头像，跳转到对应用户资料界面
         ivUserIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //获取博客作者用户名，传递到下一个界面
-                String name = mBlog.getUserEntity().getUsername();
-                Intent intent=new Intent(DetailsActivity.this,ChatActivity.class);
-                intent.putExtra("name",name);
-                startActivity(intent);
+                UserEntity user = mBlog.getUserEntity();
+//                Intent intent=new Intent(BlogDetailActivity.this,ChatActivity.class);
+//                intent.putExtra("user",user);
+//                startActivity(intent);
+                UserDetailActivity.startActivity(BlogDetailActivity.this,user);
             }
         });
     }
@@ -146,9 +152,9 @@ public class DetailsActivity extends BaseAcitvity {
                 //准备请求需要的相关数据
                 int blogId = mBlog.getBlogId();
                 String userName = spUtil.getUserName();
-                String userPassWd = spUtil.getUserPassWd();
+                String token = spUtil.getToken();
 
-                internetUtil.deleteBlog(blogId, userName, userPassWd);
+                internetUtil.deleteBlog(blogId, userName, token);
 
                 break;
         }

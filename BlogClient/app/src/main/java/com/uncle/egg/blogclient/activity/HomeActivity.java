@@ -391,8 +391,9 @@ public class HomeActivity extends AppCompatActivity
                     nowMode = MY_BLOG;
                 }
             }
-        } else if (id == R.id.nav_slideshow) {
-
+        } else if (id == R.id.nav_recent) {
+            Intent intent=new Intent(this,MessageActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {

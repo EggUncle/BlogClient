@@ -9,15 +9,17 @@ import android.widget.RelativeLayout;
 
 import com.uncle.egg.blogclient.R;
 
+import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
+
 /**
  * Created by egguncle on 17-1-16.
  */
 
-public abstract class BaseAcitvity extends AppCompatActivity {
+public abstract class BaseAcitvity extends SwipeBackActivity {
 
     private Toolbar toolbar;
     private RelativeLayout rlContent;
-   // private ToolbarX mToolbarX;
+    // private ToolbarX mToolbarX;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +37,7 @@ public abstract class BaseAcitvity extends AppCompatActivity {
 
     private void initView() {
         toolbar = (Toolbar) findViewById(R.id.toolbar_home);
-        setSupportActionBar(toolbar);
-
+        //  setSupportActionBar(toolbar);
         rlContent = (RelativeLayout) findViewById(R.id.rl_content);
     }
 
@@ -60,6 +61,8 @@ public abstract class BaseAcitvity extends AppCompatActivity {
         //    overridePendingTransition(R.anim.anim_in_right_left, R.anim.anim_out_right_left);
     }
 
-
+    public Toolbar getToolbar() {
+       return toolbar;
+    }
 
 }
