@@ -75,7 +75,7 @@ public class LoginActivity extends BaseAcitvity {
         loginReceiver = new LoginReceiver();
         localBroadcastManager.registerReceiver(loginReceiver, intentFilter);
 
-        netWorkUtil = new NetWorkUtil(localBroadcastManager);
+        netWorkUtil = new NetWorkUtil(localBroadcastManager,new Intent(LOGIN_BROADCAST));
     }
 
     private void initAction() {

@@ -100,7 +100,7 @@ public class MainActivity extends BaseAcitvity {
 
     private void initData() {
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        internetUtil = new NetWorkUtil(localBroadcastManager);
+        internetUtil = new NetWorkUtil(localBroadcastManager,new Intent(BLOG_BROADCAST));
         intentFilter = new IntentFilter();
         intentFilter.addAction(BLOG_BROADCAST);
         blogJsonReceiver = new BlogJsonReceiver();

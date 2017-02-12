@@ -99,9 +99,8 @@ public class HomeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         initView();
-        initAction();
         initData();
-
+        initAction();
 
     }
 
@@ -134,6 +133,8 @@ public class HomeActivity extends AppCompatActivity
         linearLayoutManager = new LinearLayoutManager(this);
         rcvHome.setLayoutManager(linearLayoutManager);
         rcvHome.setItemAnimator(new DefaultItemAnimator());
+        rcvHome.setHasFixedSize(true);
+
 
         //设置状态栏为透明
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -148,6 +149,12 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void initAction() {
+        //初始化动作
+        rshHome.setRefreshing(true);
+        String url="";
+        url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MAX, maxId);
+        internetUtil.getBlog(listBlog, url);
+
         //点击浮动按钮跳转到发布界面
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -223,7 +230,7 @@ public class HomeActivity extends AppCompatActivity
     private void initData() {
         //广播相关
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        internetUtil = new NetWorkUtil(localBroadcastManager);
+        internetUtil = new NetWorkUtil(localBroadcastManager,new Intent(HOME_BROADCAST));
         intentFilter = new IntentFilter();
         intentFilter.addAction(HOME_BROADCAST);
 
@@ -234,40 +241,6 @@ public class HomeActivity extends AppCompatActivity
         listBlog = new ArrayList<>();
         rcvAdapterHomePage = new RcvAdapterHomePage(listBlog, this);
         rcvHome.setAdapter(rcvAdapterHomePage);
-
-        //这个步骤暂时放到onresume中执行
-//        //初始化侧划菜单部分
-//        //用户昵称和描述
-//        spUtil = SPUtil.getInstance(this);
-//        String nickName = spUtil.getNickName();
-//        String description = spUtil.getDescription();
-//        tvName.setText(nickName);
-//        tvDescription.setText(description);
-//
-//        //加载头像
-//        //获取图片地址（网络）
-//        String iconImgUrl = spUtil.getIconPath();
-//        if (!"".equals(iconImgUrl)) {
-//            Glide.with(HomeActivity.this)
-//                    .load(iconImgUrl)
-//                    .error(R.mipmap.ic_launcher)
-//                    //  .override(100, 100)
-//                    .fitCenter()
-//                    // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
-//                    .into(imgIcon);
-//        }
-//
-//        String bgImgUrl = spUtil.getBgPath();
-//        if (!"".equals(bgImgUrl)) {
-//            Glide.with(HomeActivity.this)
-//                    .load(bgImgUrl)
-//                    //  .override(100, 100)
-//                    .centerCrop()
-//                    // .thumbnail(0.1f) //加载缩略图  为原图的十分之一
-//                    .into(imgBg);
-//        }
-
-
     }
 
 //    @Override
@@ -455,9 +428,7 @@ public class HomeActivity extends AppCompatActivity
                 Log.i(TAG, "onReceive: listSize" + listBlog.size());
                 Log.i(TAG, "onReceive: maxId" + maxId);
                 Log.i(TAG, "onReceive: minId" + minId);
-
                 rcvAdapterHomePage.notifyDataSetChanged();
-
 
             }
 

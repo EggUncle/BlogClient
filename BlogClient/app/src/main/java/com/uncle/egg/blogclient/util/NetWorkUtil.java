@@ -58,10 +58,10 @@ public class NetWorkUtil {
     //发布博客用的URL POST 参数 userId title content imageFile
     private final static String URL_SUMBIT_BLOG = URL_BASE + "api/submit_blog";
     //删除博客用的URL POST 参数 blogId username userpasswd
-    private  final  static String URL_DELETE_BLOG=URL_BASE+"api/blog/delete";
+    private final static String URL_DELETE_BLOG = URL_BASE + "api/blog/delete";
 
     //注册用户（云信 测试中
-    private final static String URL_REGISTERED="api/user/registered";
+    private final static String URL_REGISTERED = "api/user/registered";
 
     //图片请求时使用的参数
     //请求头像图片
@@ -79,20 +79,21 @@ public class NetWorkUtil {
     public final static int GET_MORE_MIN = 2;
     public final static int GET_ONE = 0;
 
-    private  int maxId;
-    private  int minId;
+    private int maxId;
+    private int minId;
 
-    private LocalBroadcastManager localBroadcastManager;
+    private LocalBroadcastManager mLocalBroadcastManager;
+    //用来包装广播
+    private Intent mIntent;
 
 
-    public NetWorkUtil(LocalBroadcastManager localBroadcastManager) {
-        this.localBroadcastManager = localBroadcastManager;
+    public NetWorkUtil(LocalBroadcastManager localBroadcastManager, Intent intent) {
+        mLocalBroadcastManager = localBroadcastManager;
+        mIntent = intent;
     }
 
     public NetWorkUtil() {
     }
-
-
 
 
     /**
@@ -158,13 +159,13 @@ public class NetWorkUtil {
                 BlogJson blogJson = gson.fromJson(response, BlogJson.class);
                 List<Results> listResults = blogJson.getResults();
 
-                Intent intent = new Intent(HomeActivity.HOME_BROADCAST);
+                Intent intent = mIntent;
                 intent.putExtra("type", BLOG);
                 //是否请求到了新的数据
                 //若结果为空，直接返回
                 if (listResults == null || listResults.size() == 0) {
                     intent.putExtra("isNull", true);
-                    localBroadcastManager.sendBroadcast(intent);
+                    mLocalBroadcastManager.sendBroadcast(intent);
                     return;
                 } else {
                     intent.putExtra("isNull", false);
@@ -179,13 +180,13 @@ public class NetWorkUtil {
                 //获取请求到的结果中第一条博客数据的ID，以此判断请求是去获取了更新的博客还是更旧的博客
                 int id = listResults.get(0).getBlogId();
 
-                if (listBlog.size()!=0){
+                if (listBlog.size() != 0) {
                     //获取bloglist当前最大和最小ID，已备后续的使用
                     maxId = listBlog.get(0).getBlogId();
                     minId = listBlog.get(listResults.size() - 1).getBlogId();
 
-                }else{
-                    maxId=0;
+                } else {
+                    maxId = 0;
                 }
 
                 if (id > maxId) {
@@ -199,17 +200,16 @@ public class NetWorkUtil {
                 maxId = listBlog.get(0).getBlogId();
                 minId = listBlog.get(listBlog.size() - 1).getBlogId();
 
-                Log.i(TAG, "onResponse: maxid is "+maxId);
-                Log.i(TAG, "onResponse: minid is "+minId);
+                Log.i(TAG, "onResponse: maxid is " + maxId);
+                Log.i(TAG, "onResponse: minid is " + minId);
 
                 //当前list中的blog的最大和最小id
                 intent.putExtra("maxId", maxId);
                 intent.putExtra("minId", minId);
 
 
-
                 //发送广播给HomeActivity，更新adapter
-                localBroadcastManager.sendBroadcast(intent);
+                mLocalBroadcastManager.sendBroadcast(intent);
 
             }
         }, new Response.ErrorListener() {
@@ -301,8 +301,6 @@ public class NetWorkUtil {
 //    }
 
 
-
-
     /**
      * 注册帐号
      *
@@ -338,7 +336,7 @@ public class NetWorkUtil {
                     String token = userEntity.getToken();
 
                     //登录网易云信
-                 //   doLoginWithIM(userName, token);
+                    //   doLoginWithIM(userName, token);
 
                     Log.i(TAG, "onResponse: " + nickName);
                     Log.i(TAG, "onResponse: " + userName);
@@ -347,13 +345,13 @@ public class NetWorkUtil {
                     //给RegisteredAcitvity发送广播，通知其关闭
                     Intent intent = new Intent(RegisteredActivity.REGISTERED_BROADCAST);
                     intent.putExtra("success", true);
-                    localBroadcastManager.sendBroadcast(intent);
+                    mLocalBroadcastManager.sendBroadcast(intent);
                 } else {
                     Log.i(TAG, "onResponse: failed");
                     //给RegisteredAcitvity发送广播，通知注册过程出现错误
                     Intent intent = new Intent(RegisteredActivity.REGISTERED_BROADCAST);
                     intent.putExtra("success", false);
-                    localBroadcastManager.sendBroadcast(intent);
+                    mLocalBroadcastManager.sendBroadcast(intent);
 
                 }
 
@@ -395,7 +393,7 @@ public class NetWorkUtil {
                 Gson gson = new Gson();
                 LoginJson loginJson = gson.fromJson(response, LoginJson.class);
                 if (!loginJson.isError()) {
-                    UserEntity user=loginJson.getUserEntity();
+                    UserEntity user = loginJson.getUserEntity();
 
                     Log.i(TAG, "onResponse: " + loginJson.getUserEntity().getUsername());
                     Log.i(TAG, "onResponse: " + loginJson.getUserEntity().getBgPath());
@@ -411,7 +409,7 @@ public class NetWorkUtil {
                     loginJson.getUserEntity().setIconPath(iconPath);
 
                     //进行网易云信的登录
-                    doLoginWithIM(user.getUsername(),user.getToken());
+                    doLoginWithIM(user.getUsername(), user.getToken());
 
                     //在sharePreferences中保存登录状态信息
                     SPUtil.spLogin();
@@ -422,12 +420,12 @@ public class NetWorkUtil {
                     bundle.putSerializable("userInfo", loginJson);
                     intent.putExtras(bundle);
                     //发送广播给loginactivity的接收器
-                    localBroadcastManager.sendBroadcast(intent);
+                    mLocalBroadcastManager.sendBroadcast(intent);
                 } else {
-                   // Intent intent = new Intent(LoginActivity.LOGIN_BROADCAST);
-                  //  intent.putExtra("success", false);
+                    // Intent intent = new Intent(LoginActivity.LOGIN_BROADCAST);
+                    //  intent.putExtra("success", false);
                     //发送广播给loginactivity的接收器
-                 //   localBroadcastManager.sendBroadcast(intent);
+                    //   localBroadcastManager.sendBroadcast(intent);
                 }
             }
         }, new Response.ErrorListener() {
@@ -466,8 +464,8 @@ public class NetWorkUtil {
                     @Override
                     public void onSuccess(LoginInfo loginInfo) {
                         Log.i(TAG, "onSuccess: is success");
-                        String userName=loginInfo.getAccount();
-                        String token=loginInfo.getToken();
+                        String userName = loginInfo.getAccount();
+                        String token = loginInfo.getToken();
                         //将登录信息保存入sp中
                         SPUtil spUtil = SPUtil.getInstance(MyApplication.getMyContext());
                         spUtil.setUserName(userName);
@@ -504,7 +502,7 @@ public class NetWorkUtil {
      * @param imagePath
      * @param imageType
      */
-    public void submitBlog(final String userName,final String token, final String title, final String content, final String imagePath, final String imageType) {
+    public void submitBlog(final String userName, final String token, final String title, final String content, final String imagePath, final String imageType) {
         StringRequest submitRequest = new StringRequest(Request.Method.POST, URL_SUMBIT_BLOG, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -522,8 +520,8 @@ public class NetWorkUtil {
 
                 params.put("title", title);
                 params.put("content", content);
-                params.put("userName",userName);
-                params.put("token",token);
+                params.put("userName", userName);
+                params.put("token", token);
                 String base64StrOfImg = "";
 //
                 if (!"".equals(imagePath)) {
@@ -610,28 +608,29 @@ public class NetWorkUtil {
 
     /**
      * 删除博客的方法，需要在登录状态下使用，需要验证用户名和密码
-     * @param blogId 需要删除的博客ID
+     *
+     * @param blogId   需要删除的博客ID
      * @param userName 当前用户的用户名
-     * @param token    
+     * @param token
      */
-    public void deleteBlog(final int blogId, final String userName, final String token){
-        StringRequest deleteRequest=new StringRequest(Request.Method.POST, URL_DELETE_BLOG, new Response.Listener<String>() {
+    public void deleteBlog(final int blogId, final String userName, final String token) {
+        StringRequest deleteRequest = new StringRequest(Request.Method.POST, URL_DELETE_BLOG, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.i(TAG, "onResponse: deleteBlog " +response);
+                Log.i(TAG, "onResponse: deleteBlog " + response);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params=new HashMap<>();
-                params.put("blogId",blogId+"");
-                params.put("userName",userName);
-                params.put("token",token);
+                Map<String, String> params = new HashMap<>();
+                params.put("blogId", blogId + "");
+                params.put("userName", userName);
+                params.put("token", token);
                 return params;
             }
         };

@@ -70,7 +70,7 @@ public class RegisteredActivity extends BaseAcitvity {
     private void initData() {
         //广播相关
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        netWorkUtil = new NetWorkUtil(localBroadcastManager);
+        netWorkUtil = new NetWorkUtil(localBroadcastManager,new Intent(REGISTERED_BROADCAST));
         intentFilter = new IntentFilter();
         intentFilter.addAction(REGISTERED_BROADCAST);
 
