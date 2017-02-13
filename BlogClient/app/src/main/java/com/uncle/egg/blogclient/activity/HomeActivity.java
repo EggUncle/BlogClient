@@ -151,7 +151,7 @@ public class HomeActivity extends AppCompatActivity
     private void initAction() {
         //初始化动作
         rshHome.setRefreshing(true);
-        String url="";
+        String url = "";
         url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MAX, maxId);
         internetUtil.getBlog(listBlog, url);
 
@@ -168,13 +168,13 @@ public class HomeActivity extends AppCompatActivity
         rshHome.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                String url="";
-                if (nowMode==PUBLIC_BLOG){
+                String url = "";
+                if (nowMode == PUBLIC_BLOG) {
                     url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MAX, maxId);
                 }
-                if (nowMode==MY_BLOG){
-                    int userId=Integer.parseInt(spUtil.getUserId());
-                    url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MAX, maxId,userId);
+                if (nowMode == MY_BLOG) {
+                    int userId = Integer.parseInt(spUtil.getUserId());
+                    url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MAX, maxId, userId);
                 }
 
 
@@ -182,12 +182,16 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
-        //点击用户头像跳转到登录界面
+        //点击用户头像跳转到登录/用户设置界面
         imgIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-                startActivity(intent);
+                if (spUtil.isLogin()) {
+                    UserActivity.startActivity(HomeActivity.this);
+                } else {
+                    Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -203,15 +207,15 @@ public class HomeActivity extends AppCompatActivity
                     if (listBlog != null && listBlog.size() != 0) {
 
                         //根据当前模式来构造URL
-                        String url="";
-                        if (nowMode==PUBLIC_BLOG){
+                        String url = "";
+                        if (nowMode == PUBLIC_BLOG) {
                             url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MIN, minId);
                         }
-                        if (nowMode==MY_BLOG){
-                            int userId=Integer.parseInt(spUtil.getUserId());
-                            url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MIN, minId,userId);
+                        if (nowMode == MY_BLOG) {
+                            int userId = Integer.parseInt(spUtil.getUserId());
+                            url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MIN, minId, userId);
                         }
-                     //   String url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MIN, minId);
+                        //   String url = internetUtil.makeUrl(NetWorkUtil.GET_MORE_MIN, minId);
                         internetUtil.getBlog(listBlog, url);
                     }
 
@@ -230,7 +234,7 @@ public class HomeActivity extends AppCompatActivity
     private void initData() {
         //广播相关
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        internetUtil = new NetWorkUtil(localBroadcastManager,new Intent(HOME_BROADCAST));
+        internetUtil = new NetWorkUtil(localBroadcastManager, new Intent(HOME_BROADCAST));
         intentFilter = new IntentFilter();
         intentFilter.addAction(HOME_BROADCAST);
 
@@ -265,6 +269,7 @@ public class HomeActivity extends AppCompatActivity
         //获取图片地址（网络）
         String iconImgUrl = spUtil.getIconPath();
         if (!"".equals(iconImgUrl)) {
+            Log.i(TAG, "onResume: "+iconImgUrl);
             Glide.with(HomeActivity.this)
                     .load(iconImgUrl)
                     .error(R.mipmap.ic_launcher)
@@ -365,7 +370,7 @@ public class HomeActivity extends AppCompatActivity
                 }
             }
         } else if (id == R.id.nav_recent) {
-            Intent intent=new Intent(this,MessageActivity.class);
+            Intent intent = new Intent(this, MessageActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_manage) {
 
@@ -384,13 +389,13 @@ public class HomeActivity extends AppCompatActivity
     /**
      * 清空当前博客数据，用于模式切换时使用
      */
-    public void clearBlogList(){
+    public void clearBlogList() {
         //清空list的数据，刷新adapter
         listBlog.clear();
         rcvAdapterHomePage.notifyDataSetChanged();
         //清空当前博客maxid minid数据
-        maxId=0;
-        minId=0;
+        maxId = 0;
+        minId = 0;
     }
 
     private class BlogJsonReceiver extends BroadcastReceiver {

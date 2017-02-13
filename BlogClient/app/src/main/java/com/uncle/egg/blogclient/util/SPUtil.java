@@ -49,8 +49,8 @@ public class SPUtil {
         mEditor.putString("userId", userInfo.getUserId() + "");
         mEditor.putString("nickName", userInfo.getNickname());
         mEditor.putString("description", userInfo.getDescription());
-        mEditor.putString("iconPath", userInfo.getIconPath());
-        mEditor.putString("bgPath", userInfo.getBgPath());
+        mEditor.putString("iconPath", NetWorkUtil.URL_BASE+userInfo.getIconPath());
+        mEditor.putString("bgPath",  NetWorkUtil.URL_BASE+userInfo.getBgPath());
         mEditor.putString("token", userInfo.getToken());
 
         Log.i(TAG, "saveUserInfo: " + userInfo.getUsername() + "  " + userInfo.getUserId());
@@ -69,6 +69,18 @@ public class SPUtil {
         mEditor.commit();
     }
 
+    //获取用户实例
+    public static UserEntity getUser(){
+        UserEntity user=new UserEntity();
+        user.setUsername(getUserName());
+        user.setNickname(getNickName());
+        user.setBgPath(getBgPath());
+        user.setToken(getToken());
+        user.setDescription(getDescription());
+        user.setIconPath(getIconPath());
+        user.setUserId(Integer.parseInt(getUserId()));
+        return user;
+    }
 
     //获取用户ID
     public static String getUserId() {
@@ -102,7 +114,7 @@ public class SPUtil {
     }
 
     //获取用户名
-    public String getUserName() {
+    public static String getUserName() {
         return mSharedPreferences.getString("userName", "");
     }
 
@@ -113,11 +125,11 @@ public class SPUtil {
     }
 
     //获取用户token
-    public String getToken() {
+    public static String getToken() {
         return mSharedPreferences.getString("token", "");
     }
     //保存用户token
-    public void setToken(String token){
+    public static void setToken(String token){
         mEditor.putString("token", token);
         mEditor.commit();
     }

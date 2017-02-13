@@ -14,8 +14,10 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.RequestCallback;
 import com.netease.nimlib.sdk.auth.AuthService;
@@ -24,6 +26,7 @@ import com.uncle.egg.blogclient.MyApplication;
 import com.uncle.egg.blogclient.activity.HomeActivity;
 import com.uncle.egg.blogclient.activity.LoginActivity;
 import com.uncle.egg.blogclient.activity.RegisteredActivity;
+import com.uncle.egg.blogclient.activity.UserActivity;
 import com.uncle.egg.blogclient.bean.BlogJson;
 import com.uncle.egg.blogclient.bean.LoginJson;
 import com.uncle.egg.blogclient.bean.Results;
@@ -59,6 +62,9 @@ public class NetWorkUtil {
     private final static String URL_SUMBIT_BLOG = URL_BASE + "api/submit_blog";
     //删除博客用的URL POST 参数 blogId username userpasswd
     private final static String URL_DELETE_BLOG = URL_BASE + "api/blog/delete";
+
+    //更新用户信息
+    private final static String URL_UPDATE_USER_INFO = URL_BASE + "api/user/updateinfo";
 
     //注册用户（云信 测试中
     private final static String URL_REGISTERED = "api/user/registered";
@@ -546,7 +552,8 @@ public class NetWorkUtil {
      * @param imagePath
      * @return
      */
-    public String getImageStr(String imagePath) {//将图片文件转化为字节数组字符串，并对其进行Base64编码处理
+    public String getImageStr(String imagePath) {
+        //将图片文件转化为字节数组字符串，并对其进行Base64编码处理
         //decode to bitmap
         Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
 
@@ -637,4 +644,53 @@ public class NetWorkUtil {
         MyApplication.getQueue().add(deleteRequest);
     }
 
+
+    /**
+     * 传入用户实例进行更新，因为图片需要额外处理，所以此处额外传入图片路径
+     *
+     * @param userEntity
+     * @param imagePath
+     */
+    public void updateUserInfo(UserEntity userEntity, final String imagePath, final String token) {
+        //将对象转化为json字符串来专递
+        Gson gson = new Gson();
+        final String jsonStr = gson.toJson(userEntity);
+        StringRequest updateReuqest = new StringRequest(Request.Method.POST, URL_UPDATE_USER_INFO, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(TAG, "onResponse: " + response);
+                if (!"".equals(response)) {
+                    Gson gson = new Gson();
+                    UserEntity user = gson.fromJson(response, UserEntity.class);
+                    SPUtil sp = SPUtil.getInstance(MyApplication.getMyContext());
+                    sp.saveUserInfo(user);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("json", jsonStr);
+                String base64StrOfImg = "";
+//
+                if (!"".equals(imagePath)) {
+                    base64StrOfImg = getImageStr(imagePath);
+                }
+
+                //   Log.i(TAG, "getParams: "+base64StrOfImg);
+//
+                params.put("base64StrOfImg", base64StrOfImg);
+                params.put("imgtype", imagePath.substring(imagePath.indexOf(".") + 1));
+                params.put("token", token);
+                return params;
+            }
+        };
+        MyApplication.getQueue().add(updateReuqest);
+
+    }
 }

@@ -104,6 +104,7 @@ public class RcvAdapterMessageList extends RecyclerView.Adapter<RcvAdapterMessag
         holder.tvUserMessage.setText(list.get(list.size()-1).getContent());
         holder.ivIcon.setImageResource(R.mipmap.ic_launcher);
         holder.tvNotify.setText(list.size()+"");
+        holder.tvNotify.setText(list.get(position).getTime()+"");
 
         //点击列表项，打开对应用户聊天界面
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -139,6 +140,8 @@ public class RcvAdapterMessageList extends RecyclerView.Adapter<RcvAdapterMessag
         private CircleImageView ivIcon;
         private TextView tvUserName;
         private TextView tvUserMessage;
+        private TextView tvMessageDate;
+
         //未读计数
         private TextView tvNotify;
 
@@ -147,6 +150,7 @@ public class RcvAdapterMessageList extends RecyclerView.Adapter<RcvAdapterMessag
             ivIcon = (CircleImageView) itemView.findViewById(R.id.iv_icon);
             tvUserName = (TextView) itemView.findViewById(R.id.tv_user_name);
             tvUserMessage = (TextView) itemView.findViewById(R.id.tv_user_message);
+            tvMessageDate = (TextView) itemView.findViewById(R.id.tv_message_date);
             tvNotify = (TextView) itemView.findViewById(R.id.tv_notify);
 
         }
